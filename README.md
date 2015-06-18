@@ -109,13 +109,14 @@ To package final distribution do:
 The archive is generated under _zeppelin-distribution/target_ directory
 
 ###Run end-to-end tests
-Zeppelin comes with a set of end-to-end acceptnce tests driving headless selenium browser
+Zeppelin comes with a set of end-to-end acceptance tests driving headless selenium browser
 
       #assumes zeppelin-server running on localhost:8080 (use -Durl=.. to override)
       mvn verify
 
       #or take care of starting\stoping zeppelin-server from packaged _zeppelin-distribuion/target_
       mvn verify -P using-packaged-distr
+
 
 
 [![Analytics](https://ga-beacon.appspot.com/UA-45176241-4/apache/incubator-zeppelin/README.md?pixel)](https://github.com/igrigorik/ga-beacon)
