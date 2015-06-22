@@ -442,6 +442,14 @@ public class SparkInterpreter extends Interpreter {
       intp.interpret("import org.apache.spark.sql.functions._");
     }
 
+    // Utility functions for display
+    intp.interpret("import org.apache.zeppelin.spark.utils.DisplayUtils._");
+
+    // Scala implicit value for spark.maxResult
+    intp.interpret("import org.apache.zeppelin.spark.utils.SparkMaxResult");
+    intp.interpret("implicit val sparkMaxResult = new SparkMaxResult(" +
+            Integer.parseInt(getProperty("zeppelin.spark.maxResult")) + ")");
+
     try {
       if (sc.version().startsWith("1.1") || sc.version().startsWith("1.2")) {
         Method loadFiles = this.interpreter.getClass().getMethod("loadFiles", Settings.class);
