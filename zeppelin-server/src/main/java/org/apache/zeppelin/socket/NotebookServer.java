@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.zeppelin.display.AngularObject;
 import org.apache.zeppelin.display.AngularObjectRegistry;
 import org.apache.zeppelin.display.AngularObjectRegistryListener;
@@ -39,9 +41,8 @@ import org.apache.zeppelin.scheduler.JobListener;
 import org.apache.zeppelin.scheduler.Job.Status;
 import org.apache.zeppelin.server.ZeppelinServer;
 import org.apache.zeppelin.socket.Message.OP;
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
+import org.eclipse.jetty.websocket.WebSocket;
+import org.eclipse.jetty.websocket.WebSocketServlet;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,46 +55,36 @@ import com.google.gson.Gson;
  *
  * @author anthonycorbacho
  */
-public class NotebookServer extends WebSocketServer implements
-    JobListenerFactory, AngularObjectRegistryListener {
+public class NotebookServer extends WebSocketServlet implements
+    NotebookSocketListener, JobListenerFactory, AngularObjectRegistryListener {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NotebookServer.class);
-  private static final String DEFAULT_ADDR = "0.0.0.0";
-  private static final int DEFAULT_PORT = 8282;
-
-  private static void creatingwebSocketServerLog(String address, int port) {
-    LOG.info("Create zeppelin websocket on {}:{}", address, port);
-  }
+  private static final Logger LOG = LoggerFactory
+      .getLogger(NotebookServer.class);
 
   Gson gson = new Gson();
-  Map<String, List<WebSocket>> noteSocketMap = new HashMap<String, List<WebSocket>>();
-  List<WebSocket> connectedSockets = new LinkedList<WebSocket>();
-
-  public NotebookServer() {
-    super(new InetSocketAddress(DEFAULT_ADDR, DEFAULT_PORT));
-    creatingwebSocketServerLog(DEFAULT_ADDR, DEFAULT_PORT);
-  }
-
-  public NotebookServer(String address, int port) {
-    super(new InetSocketAddress(address, port));
-    creatingwebSocketServerLog(address, port);
-  }
+  Map<String, List<NotebookSocket>> noteSocketMap = new HashMap<String, List<NotebookSocket>>();
+  List<NotebookSocket> connectedSockets = new LinkedList<NotebookSocket>();
 
   private Notebook notebook() {
     return ZeppelinServer.notebook;
   }
 
   @Override
-  public void onOpen(WebSocket conn, ClientHandshake handshake) {
-    LOG.info("New connection from {} : {}", conn.getRemoteSocketAddress().getHostName(), conn
-        .getRemoteSocketAddress().getPort());
+  public WebSocket doWebSocketConnect(HttpServletRequest req, String protocol) {
+    return new NotebookSocket(req, protocol, this);
+  }
+
+  @Override
+  public void onOpen(NotebookSocket conn) {
+    LOG.info("New connection from {} : {}", conn.getRequest().getRemoteAddr(),
+        conn.getRequest().getRemotePort());
     synchronized (connectedSockets) {
       connectedSockets.add(conn);
     }
   }
 
   @Override
-  public void onMessage(WebSocket conn, String msg) {
+  public void onMessage(NotebookSocket conn, String msg) {
     Notebook notebook = notebook();
     try {
       Message messagereceived = deserializeMessage(msg);
@@ -107,7 +98,7 @@ public class NotebookServer extends WebSocketServer implements
             sendNote(conn, notebook, messagereceived);
             break;
           case NEW_NOTE:
-            createNote(conn, notebook);
+            createNote(conn, notebook, messagereceived);
             break;
           case DEL_NOTE:
             removeNote(conn, notebook, messagereceived);
@@ -138,7 +129,7 @@ public class NotebookServer extends WebSocketServer implements
             break;
           case PING:
             pong();
-            break;          
+            break;
           case ANGULAR_OBJECT_UPDATED:
             angularObjectUpdated(conn, notebook, messagereceived);
             break;
@@ -152,17 +143,9 @@ public class NotebookServer extends WebSocketServer implements
   }
 
   @Override
-  public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-    LOG.info("Closed connection to {} : {}", conn.getRemoteSocketAddress().getHostName(), conn
-        .getRemoteSocketAddress().getPort());
-    removeConnectionFromAllNote(conn);
-    synchronized (connectedSockets) {
-      connectedSockets.remove(conn);
-    }
-  }
-
-  @Override
-  public void onError(WebSocket conn, Exception message) {
+  public void onClose(NotebookSocket conn, int code, String reason) {
+    LOG.info("Closed connection to {} : {}. ({}) {}", conn.getRequest()
+        .getRemoteAddr(), conn.getRequest().getRemotePort(), code, reason);
     removeConnectionFromAllNote(conn);
     synchronized (connectedSockets) {
       connectedSockets.remove(conn);
@@ -178,12 +161,13 @@ public class NotebookServer extends WebSocketServer implements
     return gson.toJson(m);
   }
 
-  private void addConnectionToNote(String noteId, WebSocket socket) {
+  private void addConnectionToNote(String noteId, NotebookSocket socket) {
     synchronized (noteSocketMap) {
-      removeConnectionFromAllNote(socket); // make sure a socket relates only a single note.
-      List<WebSocket> socketList = noteSocketMap.get(noteId);
+      removeConnectionFromAllNote(socket); // make sure a socket relates only a
+                                           // single note.
+      List<NotebookSocket> socketList = noteSocketMap.get(noteId);
       if (socketList == null) {
-        socketList = new LinkedList<WebSocket>();
+        socketList = new LinkedList<NotebookSocket>();
         noteSocketMap.put(noteId, socketList);
       }
 
@@ -193,9 +177,9 @@ public class NotebookServer extends WebSocketServer implements
     }
   }
 
-  private void removeConnectionFromNote(String noteId, WebSocket socket) {
+  private void removeConnectionFromNote(String noteId, NotebookSocket socket) {
     synchronized (noteSocketMap) {
-      List<WebSocket> socketList = noteSocketMap.get(noteId);
+      List<NotebookSocket> socketList = noteSocketMap.get(noteId);
       if (socketList != null) {
         socketList.remove(socket);
       }
@@ -204,11 +188,11 @@ public class NotebookServer extends WebSocketServer implements
 
   private void removeNote(String noteId) {
     synchronized (noteSocketMap) {
-      List<WebSocket> socketList = noteSocketMap.remove(noteId);
+      List<NotebookSocket> socketList = noteSocketMap.remove(noteId);
     }
   }
 
-  private void removeConnectionFromAllNote(WebSocket socket) {
+  private void removeConnectionFromAllNote(NotebookSocket socket) {
     synchronized (noteSocketMap) {
       Set<String> keys = noteSocketMap.keySet();
       for (String noteId : keys) {
@@ -217,12 +201,12 @@ public class NotebookServer extends WebSocketServer implements
     }
   }
 
-  private String getOpenNoteId(WebSocket socket) {
+  private String getOpenNoteId(NotebookSocket socket) {
     String id = null;
     synchronized (noteSocketMap) {
       Set<String> keys = noteSocketMap.keySet();
       for (String noteId : keys) {
-        List<WebSocket> sockets = noteSocketMap.get(noteId);
+        List<NotebookSocket> sockets = noteSocketMap.get(noteId);
         if (sockets.contains(socket)) {
           id = noteId;
         }
@@ -231,7 +215,8 @@ public class NotebookServer extends WebSocketServer implements
     return id;
   }
 
-  private void broadcastToNoteBindedInterpreter(String interpreterGroupId, Message m) {
+  private void broadcastToNoteBindedInterpreter(String interpreterGroupId,
+      Message m) {
     Notebook notebook = notebook();
     List<Note> notes = notebook.getAllNotes();
     for (Note note : notes) {
@@ -246,23 +231,31 @@ public class NotebookServer extends WebSocketServer implements
 
   private void broadcast(String noteId, Message m) {
     synchronized (noteSocketMap) {
-      List<WebSocket> socketLists = noteSocketMap.get(noteId);
+      List<NotebookSocket> socketLists = noteSocketMap.get(noteId);
       if (socketLists == null || socketLists.size() == 0) {
         return;
       }
 
       LOG.info("SEND >> " + m.op);
 
-      for (WebSocket conn : socketLists) {
-        conn.send(serializeMessage(m));
+      for (NotebookSocket conn : socketLists) {
+        try {
+          conn.send(serializeMessage(m));
+        } catch (IOException e) {
+          LOG.error("socket error", e);
+        }
       }
     }
   }
 
   private void broadcastAll(Message m) {
     synchronized (connectedSockets) {
-      for (WebSocket conn : connectedSockets) {
-        conn.send(serializeMessage(m));
+      for (NotebookSocket conn : connectedSockets) {
+        try {
+          conn.send(serializeMessage(m));
+        } catch (IOException e) {
+          LOG.error("socket error", e);
+        }
       }
     }
   }
@@ -284,7 +277,8 @@ public class NotebookServer extends WebSocketServer implements
     broadcastAll(new Message(OP.NOTES_INFO).put("notes", notesInfo));
   }
 
-  private void sendNote(WebSocket conn, Notebook notebook, Message fromMessage) {
+  private void sendNote(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     String noteId = (String) fromMessage.get("id");
     if (noteId == null) {
       return;
@@ -302,7 +296,8 @@ public class NotebookServer extends WebSocketServer implements
       throws SchedulerException, IOException {
     String noteId = (String) fromMessage.get("id");
     String name = (String) fromMessage.get("name");
-    Map<String, Object> config = (Map<String, Object>) fromMessage.get("config");
+    Map<String, Object> config = (Map<String, Object>) fromMessage
+        .get("config");
     if (noteId == null) {
       return;
     }
@@ -325,7 +320,8 @@ public class NotebookServer extends WebSocketServer implements
     }
   }
 
-  private boolean isCronUpdated(Map<String, Object> configA, Map<String, Object> configB) {
+  private boolean isCronUpdated(Map<String, Object> configA,
+      Map<String, Object> configB) {
     boolean cronUpdated = false;
     if (configA.get("cron") != null && configB.get("cron") != null
         && configA.get("cron").equals(configB.get("cron"))) {
@@ -338,9 +334,14 @@ public class NotebookServer extends WebSocketServer implements
     return cronUpdated;
   }
 
-  private void createNote(WebSocket conn, Notebook notebook) throws IOException {
+  private void createNote(WebSocket conn, Notebook notebook, Message message) throws IOException {
     Note note = notebook.createNote();
     note.addParagraph(); // it's an empty note. so add one paragraph
+    if (message != null) {
+      String noteName = (String) message.get("name");
+      if (noteName != null && !noteName.isEmpty())
+        note.setName(noteName);
+    }
     note.persist();
     broadcastNote(note);
     broadcastNoteList();
@@ -353,20 +354,21 @@ public class NotebookServer extends WebSocketServer implements
       return;
     }
     Note note = notebook.getNote(noteId);
-    note.unpersist();
     notebook.removeNote(noteId);
     removeNote(noteId);
     broadcastNoteList();
   }
 
-  private void updateParagraph(WebSocket conn, Notebook notebook, Message fromMessage)
-      throws IOException {
+  private void updateParagraph(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     String paragraphId = (String) fromMessage.get("id");
     if (paragraphId == null) {
       return;
     }
-    Map<String, Object> params = (Map<String, Object>) fromMessage.get("params");
-    Map<String, Object> config = (Map<String, Object>) fromMessage.get("config");
+    Map<String, Object> params = (Map<String, Object>) fromMessage
+        .get("params");
+    Map<String, Object> config = (Map<String, Object>) fromMessage
+        .get("config");
     final Note note = notebook.getNote(getOpenNoteId(conn));
     Paragraph p = note.getParagraph(paragraphId);
     p.settings.setParams(params);
@@ -377,8 +379,8 @@ public class NotebookServer extends WebSocketServer implements
     broadcast(note.id(), new Message(OP.PARAGRAPH).put("paragraph", p));
   }
 
-  private void removeParagraph(WebSocket conn, Notebook notebook, Message fromMessage)
-      throws IOException {
+  private void removeParagraph(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     final String paragraphId = (String) fromMessage.get("id");
     if (paragraphId == null) {
       return;
@@ -392,7 +394,8 @@ public class NotebookServer extends WebSocketServer implements
     }
   }
 
-  private void completion(WebSocket conn, Notebook notebook, Message fromMessage) {
+  private void completion(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     String paragraphId = (String) fromMessage.get("id");
     String buffer = (String) fromMessage.get("buf");
     int cursor = (int) Double.parseDouble(fromMessage.get("cursor").toString());
@@ -411,6 +414,7 @@ public class NotebookServer extends WebSocketServer implements
 
   /**
    * When angular object updated from client
+   * 
    * @param conn
    * @param notebook
    * @param fromMessage
@@ -422,10 +426,14 @@ public class NotebookServer extends WebSocketServer implements
     String varName = (String) fromMessage.get("name");
     Object varValue = fromMessage.get("value");
 
+    AngularObject ao = null;
+    boolean global = false;
+
     // propagate change to (Remote) AngularObjectRegistry
     Note note = notebook.getNote(noteId);
     if (note != null) {
-      List<InterpreterSetting> settings = note.getNoteReplLoader().getInterpreterSettings();
+      List<InterpreterSetting> settings = note.getNoteReplLoader()
+          .getInterpreterSettings();
       for (InterpreterSetting setting : settings) {
         if (setting.getInterpreterGroup() == null) {
           continue;
@@ -434,12 +442,23 @@ public class NotebookServer extends WebSocketServer implements
         if (interpreterGroupId.equals(setting.getInterpreterGroup().getId())) {
           AngularObjectRegistry angularObjectRegistry = setting
               .getInterpreterGroup().getAngularObjectRegistry();
-          AngularObject ao = angularObjectRegistry.get(varName);
+
+          // first trying to get local registry
+          ao = angularObjectRegistry.get(varName, noteId);
           if (ao == null) {
-            LOG.warn("Object {} is not binded", varName);
+            // then try global registry
+            ao = angularObjectRegistry.get(varName, null);
+            if (ao == null) {
+              LOG.warn("Object {} is not binded", varName);
+            } else {
+              // path from client -> server
+              ao.set(varValue, false);
+              global = true;
+            }
           } else {
             // path from client -> server
             ao.set(varValue, false);
+            global = false;
           }
 
           break;
@@ -447,45 +466,55 @@ public class NotebookServer extends WebSocketServer implements
       }
     }
 
-    // broadcast change to all web session that uses related interpreter.
-    for (Note n : notebook.getAllNotes()) {
-      List<InterpreterSetting> settings = note.getNoteReplLoader().getInterpreterSettings();
-      for (InterpreterSetting setting : settings) {
-        if (setting.getInterpreterGroup() == null) {
-          continue;
-        }
+    if (global) { // broadcast change to all web session that uses related
+                  // interpreter.
+      for (Note n : notebook.getAllNotes()) {
+        List<InterpreterSetting> settings = note.getNoteReplLoader()
+            .getInterpreterSettings();
+        for (InterpreterSetting setting : settings) {
+          if (setting.getInterpreterGroup() == null) {
+            continue;
+          }
 
-        if (interpreterGroupId.equals(setting.getInterpreterGroup().getId())) {
-          AngularObjectRegistry angularObjectRegistry = setting
-              .getInterpreterGroup().getAngularObjectRegistry();
-          AngularObject ao = angularObjectRegistry.get(varName);
-          this.broadcast(n.id(), new Message(OP.ANGULAR_OBJECT_UPDATE)
-                              .put("angularObject", ao)
-                              .put("interpreterGroupId", interpreterGroupId)
-                              .put("noteId", n.id()));
+          if (interpreterGroupId.equals(setting.getInterpreterGroup().getId())) {
+            AngularObjectRegistry angularObjectRegistry = setting
+                .getInterpreterGroup().getAngularObjectRegistry();
+            this.broadcast(
+                n.id(),
+                new Message(OP.ANGULAR_OBJECT_UPDATE).put("angularObject", ao)
+                    .put("interpreterGroupId", interpreterGroupId)
+                    .put("noteId", n.id()));
+          }
         }
       }
+    } else { // broadcast to all web session for the note
+      this.broadcast(
+          note.id(),
+          new Message(OP.ANGULAR_OBJECT_UPDATE).put("angularObject", ao)
+              .put("interpreterGroupId", interpreterGroupId)
+              .put("noteId", note.id()));
     }
   }
 
-
-  private void moveParagraph(WebSocket conn, Notebook notebook, Message fromMessage)
-      throws IOException {
+  private void moveParagraph(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     final String paragraphId = (String) fromMessage.get("id");
     if (paragraphId == null) {
       return;
     }
 
-    final int newIndex = (int) Double.parseDouble(fromMessage.get("index").toString());
+    final int newIndex = (int) Double.parseDouble(fromMessage.get("index")
+        .toString());
     final Note note = notebook.getNote(getOpenNoteId(conn));
     note.moveParagraph(paragraphId, newIndex);
     note.persist();
     broadcastNote(note);
   }
 
-  private void insertParagraph(WebSocket conn, Notebook notebook, Message fromMessage)
-      throws IOException {
-    final int index = (int) Double.parseDouble(fromMessage.get("index").toString());
+  private void insertParagraph(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
+    final int index = (int) Double.parseDouble(fromMessage.get("index")
+        .toString());
 
     final Note note = notebook.getNote(getOpenNoteId(conn));
     note.insertParagraph(index);
@@ -493,9 +522,8 @@ public class NotebookServer extends WebSocketServer implements
     broadcastNote(note);
   }
 
-
-  private void cancelParagraph(WebSocket conn, Notebook notebook, Message fromMessage)
-      throws IOException {
+  private void cancelParagraph(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     final String paragraphId = (String) fromMessage.get("id");
     if (paragraphId == null) {
       return;
@@ -506,8 +534,8 @@ public class NotebookServer extends WebSocketServer implements
     p.abort();
   }
 
-  private void runParagraph(WebSocket conn, Notebook notebook, Message fromMessage)
-      throws IOException {
+  private void runParagraph(NotebookSocket conn, Notebook notebook,
+      Message fromMessage) throws IOException {
     final String paragraphId = (String) fromMessage.get("id");
     if (paragraphId == null) {
       return;
@@ -517,13 +545,16 @@ public class NotebookServer extends WebSocketServer implements
     String text = (String) fromMessage.get("paragraph");
     p.setText(text);
     p.setTitle((String) fromMessage.get("title"));
-    Map<String, Object> params = (Map<String, Object>) fromMessage.get("params");
+    Map<String, Object> params = (Map<String, Object>) fromMessage
+        .get("params");
     p.settings.setParams(params);
-    Map<String, Object> config = (Map<String, Object>) fromMessage.get("config");
+    Map<String, Object> config = (Map<String, Object>) fromMessage
+        .get("config");
     p.setConfig(config);
 
     // if it's the last paragraph, let's add a new one
-    boolean isTheLastParagraph = note.getLastParagraph().getId().equals(p.getId());
+    boolean isTheLastParagraph = note.getLastParagraph().getId()
+        .equals(p.getId());
     if (!Strings.isNullOrEmpty(text) && isTheLastParagraph) {
       note.addParagraph();
     }
@@ -532,12 +563,12 @@ public class NotebookServer extends WebSocketServer implements
 
     try {
       note.run(paragraphId);
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       LOG.error("Exception from run", ex);
       if (p != null) {
-        p.setReturn(new InterpreterResult(
-          InterpreterResult.Code.ERROR, ex.getMessage()), ex);
+        p.setReturn(
+            new InterpreterResult(InterpreterResult.Code.ERROR, ex.getMessage()),
+            ex);
         p.setStatus(Status.ERROR);
       }
     }
@@ -558,17 +589,22 @@ public class NotebookServer extends WebSocketServer implements
 
     @Override
     public void onProgressUpdate(Job job, int progress) {
-      notebookServer.broadcast(note.id(),
-          new Message(OP.PROGRESS).put("id", job.getId()).put("progress", job.progress()));
+      notebookServer.broadcast(
+          note.id(),
+          new Message(OP.PROGRESS).put("id", job.getId()).put("progress",
+              job.progress()));
     }
 
     @Override
-    public void beforeStatusChange(Job job, Status before, Status after) {}
+    public void beforeStatusChange(Job job, Status before, Status after) {
+    }
 
     @Override
     public void afterStatusChange(Job job, Status before, Status after) {
       if (after == Status.ERROR) {
-        job.getException().printStackTrace();
+        if (job.getException() != null) {
+          LOG.error("Error", job.getException());
+        }
       }
       if (job.isTerminated()) {
         LOG.info("Job {} is finished", job.getId());
@@ -590,19 +626,22 @@ public class NotebookServer extends WebSocketServer implements
   private void pong() {
   }
 
-  private void sendAllAngularObjects(Note note, WebSocket conn) {
-    List<InterpreterSetting> settings = note.getNoteReplLoader().getInterpreterSettings();
+  private void sendAllAngularObjects(Note note, NotebookSocket conn) throws IOException {
+    List<InterpreterSetting> settings = note.getNoteReplLoader()
+        .getInterpreterSettings();
     if (settings == null || settings.size() == 0) {
       return;
     }
 
     for (InterpreterSetting intpSetting : settings) {
-      AngularObjectRegistry registry = intpSetting.getInterpreterGroup().getAngularObjectRegistry();
-      List<AngularObject> objects = registry.getAll();
+      AngularObjectRegistry registry = intpSetting.getInterpreterGroup()
+          .getAngularObjectRegistry();
+      List<AngularObject> objects = registry.getAllWithGlobal(note.id());
       for (AngularObject object : objects) {
         conn.send(serializeMessage(new Message(OP.ANGULAR_OBJECT_UPDATE)
-          .put("angularObject", object)
-            .put("interpreterGroupId", intpSetting.getInterpreterGroup().getId())
+            .put("angularObject", object)
+            .put("interpreterGroupId",
+                intpSetting.getInterpreterGroup().getId())
             .put("noteId", note.id())));
       }
     }
@@ -616,37 +655,51 @@ public class NotebookServer extends WebSocketServer implements
   @Override
   public void onUpdate(String interpreterGroupId, AngularObject object) {
     Notebook notebook = notebook();
+    if (notebook == null) {
+      return;
+    }
 
     List<Note> notes = notebook.getAllNotes();
     for (Note note : notes) {
+      if (object.getNoteId() != null && !note.id().equals(object.getNoteId())) {
+        continue;
+      }
+
       List<InterpreterSetting> intpSettings = note.getNoteReplLoader()
           .getInterpreterSettings();
 
-      if (intpSettings.isEmpty()) continue;
+      if (intpSettings.isEmpty())
+        continue;
 
       for (InterpreterSetting setting : intpSettings) {
         if (setting.getInterpreterGroup().getId().equals(interpreterGroupId)) {
-          broadcast(note.id(), new Message(OP.ANGULAR_OBJECT_UPDATE)
-            .put("angularObject", object)
-            .put("interpreterGroupId", interpreterGroupId)
-            .put("noteId", note.id()));
+          broadcast(
+              note.id(),
+              new Message(OP.ANGULAR_OBJECT_UPDATE)
+                  .put("angularObject", object)
+                  .put("interpreterGroupId", interpreterGroupId)
+                  .put("noteId", note.id()));
         }
       }
     }
   }
 
   @Override
-  public void onRemove(String interpreterGroupId, AngularObject object) {
+  public void onRemove(String interpreterGroupId, String name, String noteId) {
     Notebook notebook = notebook();
     List<Note> notes = notebook.getAllNotes();
     for (Note note : notes) {
+      if (noteId != null && !note.id().equals(noteId)) {
+        continue;
+      }
+
       List<String> ids = note.getNoteReplLoader().getInterpreters();
       for (String id : ids) {
         if (id.equals(interpreterGroupId)) {
           broadcast(
               note.id(),
-              new Message(OP.ANGULAR_OBJECT_REMOVE).put("name",
-                  object.getName()));
+              new Message(OP.ANGULAR_OBJECT_REMOVE).put("name", name).put(
+                  "noteId", noteId));
         }
       }
     }

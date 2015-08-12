@@ -29,7 +29,7 @@ HADOOP_VERSION="${2}"
 FWDIR=$(dirname "${BASH_SOURCE-$0}")
 ZEPPELIN_HOME="$(cd "${FWDIR}/.."; pwd)"
 export SPARK_HOME=${ZEPPELIN_HOME}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}
-
+echo "SPARK_HOME is ${SPARK_HOME} " 
 if [ ! -d "${SPARK_HOME}" ]; then
     wget -q http://www.us.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
     tar zxf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
@@ -45,4 +45,10 @@ export SPARK_MASTER_PORT=7071
 export SPARK_MASTER_WEBUI_PORT=7072
 export SPARK_WORKER_WEBUI_PORT=8082
 ${SPARK_HOME}/sbin/start-master.sh
-${SPARK_HOME}/sbin/start-slave.sh 1 `hostname`:${SPARK_MASTER_PORT}
+
+echo ${SPARK_VERSION} | grep "^1.4" > /dev/null
+if [ $? -ne 0 ]; then   # spark 1.3 or prior
+    ${SPARK_HOME}/sbin/start-slave.sh 1 `hostname`:${SPARK_MASTER_PORT}
+else
+    ${SPARK_HOME}/sbin/start-slave.sh spark://`hostname`:7071
+fi
