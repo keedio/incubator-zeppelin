@@ -1155,7 +1155,7 @@ angular.module('zeppelinWebApp')
     };
 
     var getIndex = function(previous, actual) {
-      return (previous == null) ? actual : Math.min(previous, actual);
+      return (previous === null) ? actual : Math.min(previous, actual);
     };
 
     var schema = {};
@@ -1210,7 +1210,7 @@ angular.module('zeppelinWebApp')
           p[groupKey] = {};
         }
         p = p[groupKey];
-        if (keys.length == 0) {
+        if (keys.length === 0) {
           p.rowIndex = getIndex(p.rowIndex, i);
         }
       }
@@ -1240,7 +1240,7 @@ angular.module('zeppelinWebApp')
             count : (aggrFuncDiv[value.aggr]) ?  p[valueKey].count+1 : p[valueKey].count
           };
         }
-        if (keys.length == 0 && groups.length == 0) {
+        if (keys.length === 0 && groups.length === 0) {
           p.idx = getIndex(p.idx, v );
         }
       }
@@ -1254,11 +1254,11 @@ angular.module('zeppelinWebApp')
       else { return 0; }
     };
     var rowsArray = [];
-    for (var key in rows) {
+    for (var rowKey in rows) {
       var e = {};
-      e[key] = rows[key];
+      e[rowKey] = rows[rowKey];
       rowsArray.push(e);
-    };
+    }
     rowsArray.sort(compareRowIndex);
 
     //console.log("schema=%o, rows=%o", schema, rows);
