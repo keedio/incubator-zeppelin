@@ -17,6 +17,7 @@
 
 package org.apache.zeppelin.notebook;
 
+import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.display.AngularObjectRegistry;
 import org.apache.zeppelin.display.GUI;
 import org.apache.zeppelin.display.Input;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -184,6 +186,7 @@ public class Paragraph extends Job implements Serializable {
 
   @Override
   protected Object jobRun() throws Throwable {
+    
     String replName = getRequiredReplName();
     Interpreter repl = getRepl(replName);
     logger().info("run paragraph {} using {} " + repl, getId(), replName);
@@ -201,7 +204,9 @@ public class Paragraph extends Job implements Serializable {
       Map<String, Input> inputs = Input.extractSimpleQueryParam(scriptBody); // inputs will be built
                                                                              // from script body
       settings.setForms(inputs);
-      script = Input.getSimpleQuery(settings.getParams(), scriptBody);
+      String utilityClass = ZeppelinConfiguration.create()
+          .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "org.keedio.Utils");
+      script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
     }
     logger().info("RUN : " + script);
     InterpreterResult ret = repl.interpret(script, getInterpreterContext());
