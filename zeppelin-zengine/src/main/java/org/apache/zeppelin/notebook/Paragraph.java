@@ -23,6 +23,7 @@ import org.apache.zeppelin.display.GUI;
 import org.apache.zeppelin.display.Input;
 import org.apache.zeppelin.interpreter.*;
 import org.apache.zeppelin.interpreter.Interpreter.FormType;
+import org.apache.zeppelin.interpreter.InterpreterResult.Code;
 import org.apache.zeppelin.scheduler.Job;
 import org.apache.zeppelin.scheduler.JobListener;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Paragraph is a representation of an execution unit.
@@ -206,7 +208,29 @@ public class Paragraph extends Job implements Serializable {
       settings.setForms(inputs);
       String utilityClass = ZeppelinConfiguration.create()
           .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "org.keedio.Utils");
-      script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
+      
+      //Spark interpreter pre-evaluation
+      // Recorremos todos los parametros evaluando sii es posible
+      Map<String, Object> aux = new HashMap<String, Object>();
+      Iterator entrySet = settings.getParams().entrySet().iterator();
+      while (entrySet.hasNext()) {
+        Entry thisEntry = (Entry) entrySet.next();
+        String key = thisEntry.getKey().toString();
+        String value = thisEntry.getValue().toString();
+        if (value.indexOf("eval:") == 0) {
+          value = value.substring("eval:".length());
+          Interpreter sparkInt = getRepl("spark");
+          InterpreterResult res = sparkInt.interpret(value, getInterpreterContext());
+          if (res.code() != Code.SUCCESS) {
+            return res;
+          }
+          
+          aux.put(key, res.message());
+        } else {
+          aux.put(key, value);
+        }
+      }
+      script = Input.getSimpleQuery(aux, scriptBody);
     }
     logger().info("RUN : " + script);
     InterpreterResult ret = repl.interpret(script, getInterpreterContext());
