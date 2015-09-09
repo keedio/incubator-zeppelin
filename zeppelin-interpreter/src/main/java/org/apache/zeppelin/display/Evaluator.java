@@ -28,7 +28,7 @@ import org.apache.commons.jexl2.MapContext;
  */
 public class Evaluator {
   
-  Object utilityClass;
+  Class utilityClass;
 
   /**
    * Eval passed expression. Should be defined on Utils class 
@@ -38,7 +38,7 @@ public class Evaluator {
    * @throws InstantiationException 
    */
   public Evaluator(String classImpl) throws Exception {
-    this.utilityClass = Class.forName(classImpl).newInstance();
+    this.utilityClass = Class.forName(classImpl);
   }
   
   public Object eval(String command) {

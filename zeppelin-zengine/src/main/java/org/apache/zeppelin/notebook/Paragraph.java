@@ -209,28 +209,8 @@ public class Paragraph extends Job implements Serializable {
       String utilityClass = ZeppelinConfiguration.create()
           .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "org.keedio.Utils");
       
-      //Spark interpreter pre-evaluation
-      // Recorremos todos los parametros evaluando sii es posible
-      Map<String, Object> aux = new HashMap<String, Object>();
-      Iterator entrySet = settings.getParams().entrySet().iterator();
-      while (entrySet.hasNext()) {
-        Entry thisEntry = (Entry) entrySet.next();
-        String key = thisEntry.getKey().toString();
-        String value = thisEntry.getValue().toString();
-        if (value.indexOf("eval:") == 0) {
-          value = value.substring("eval:".length());
-          Interpreter sparkInt = getRepl("spark");
-          InterpreterResult res = sparkInt.interpret(value, getInterpreterContext());
-          if (res.code() != Code.SUCCESS) {
-            return res;
-          }
-          
-          aux.put(key, res.message());
-        } else {
-          aux.put(key, value);
-        }
-      }
-      script = Input.getSimpleQuery(aux, scriptBody);
+      script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
+
     }
     logger().info("RUN : " + script);
     InterpreterResult ret = repl.interpret(script, getInterpreterContext());

@@ -33,7 +33,7 @@ public class Utils {
    * @param att2 att
    * @return Sum
    */
-  public int suma(int att1, int att2) {
+  public static int suma(int att1, int att2) {
     return att1 + att2;
   }
 
@@ -41,7 +41,7 @@ public class Utils {
    * Just a sample expression
    * @return formatted actual date
    */
-  public String now() {
+  public static String now() {
     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
     return sdf.format(new Date());
