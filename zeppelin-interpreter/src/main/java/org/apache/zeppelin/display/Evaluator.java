@@ -22,7 +22,9 @@ import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
 
 /**
- * The evaluator utility class
+ * The evaluator utility class. This class should take an expression string 
+ * and evaluate using the utility class. This class should defined 
+ * statics methods in order to interpret them
  * @author rolmo
  *
  */
@@ -41,6 +43,11 @@ public class Evaluator {
     this.utilityClass = Class.forName(classImpl);
   }
   
+  /**
+   * Eval the expression passed as argument
+   * @param command expression to eval
+   * @return
+   */
   public Object eval(String command) {
 
     Object obj;

@@ -207,8 +207,9 @@ public class Paragraph extends Job implements Serializable {
                                                                              // from script body
       settings.setForms(inputs);
       String utilityClass = ZeppelinConfiguration.create()
-          .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "org.keedio.Utils");
+          .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "");
       
+      // We have to evaluate methods defined on the utility class
       script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
 
     }

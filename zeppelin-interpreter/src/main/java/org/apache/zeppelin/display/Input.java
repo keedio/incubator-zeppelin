@@ -300,6 +300,17 @@ public class Input implements Serializable {
   }
 
 
+  /**
+   * This method is similar to getSimpleQuery. Main differences are that params
+   * argument is not changed at all, and the method look for expressions to eval 
+   * on the params map (the value will starts with 'eval:')
+   * @param params
+   * @param script
+   * @param classUtility This is the utility class used to eval expressions. The utility
+   * class should define the statisc methods to interpret
+   * @return
+   * @throws Exception
+   */
   public static String getSimpleQueryForEvaluation(Map<String, Object> params, String script
       , String classUtility) throws Exception {
     String replaced = script;
