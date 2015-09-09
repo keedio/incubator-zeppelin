@@ -920,6 +920,13 @@ angular.module('zeppelinWebApp')
         $scope.chart[type].useInteractiveGuideline(true); // for better UX and performance issue. (https://github.com/novus/nvd3/issues/691)
         $scope.chart[type].forceY([0]); // force y-axis minimum to 0 for line chart.
       }
+      if (type !== 'pieChart') {
+        $scope.chart[type].yAxis.tickFormat(function(d) {                                               
+                                              var formatNumber = d3.format(',.4s')(d);
+                                              return formatNumber; 
+                                            });                  
+        $scope.chart[type].margin({left: 50});
+      };
     }
 
     var renderChart = function() {
