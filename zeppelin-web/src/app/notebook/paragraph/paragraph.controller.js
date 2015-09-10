@@ -921,11 +921,12 @@ angular.module('zeppelinWebApp')
         $scope.chart[type].forceY([0]); // force y-axis minimum to 0 for line chart.
       }
       if (type !== 'pieChart') {
-        $scope.chart[type].yAxis.tickFormat(function(d) {                                               
-                                              var formatNumber = d3.format(',.4s')(d);
-                                              return formatNumber; 
+        $scope.chart[type].yAxis.tickFormat(function(d) {
+                                              var format = d3.format(".2f");
+                                              var prefix = d3.formatPrefix(d);
+                                              return format(prefix.scale(d)) + " " + prefix.symbol;
                                             });                  
-        $scope.chart[type].margin({left: 50});
+        $scope.chart[type].margin({left: 60});
       };
     }
 
