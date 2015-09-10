@@ -328,6 +328,7 @@ public class Input implements Serializable {
 
     for (String key : aux.keySet()) {
       Object value = aux.get(key);
+      if (value == null) continue;
       replaced = replaced.replaceAll("[_]?[$][{]([^:]*[:])?" + key
           + "([(][^)]*[)])?(=[^}]*)?[}]", value.toString());
     }

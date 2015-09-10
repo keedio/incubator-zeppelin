@@ -19,6 +19,7 @@ package org.apache.zeppelin.notebook;
 
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.display.AngularObjectRegistry;
+import org.apache.zeppelin.display.Evaluator;
 import org.apache.zeppelin.display.GUI;
 import org.apache.zeppelin.display.Input;
 import org.apache.zeppelin.interpreter.*;
@@ -43,7 +44,8 @@ public class Paragraph extends Job implements Serializable {
   private static final transient long serialVersionUID = -6328572073497992016L;
   private transient NoteInterpreterLoader replLoader;
   private transient Note note;
-
+  private static Logger LOG = LoggerFactory.getLogger(Paragraph.class);
+  
   String title;
   String text;
   Date dateUpdated;
@@ -207,14 +209,22 @@ public class Paragraph extends Job implements Serializable {
                                                                              // from script body
       settings.setForms(inputs);
       
-      String utilityClass = ZeppelinConfiguration.create()
-          .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "");
-      
-      //Always try to interpret because could be passed as a FQN class 
-      script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
-      
-      if (script == null) {
-        // Could not evaluate, so trying another way
+      if (haveToEval(settings.getParams())) {
+        try {
+          //include eval tag so hato to eval any function
+          String utilityClass = ZeppelinConfiguration.create()
+              .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "");
+          
+          script = Input.getSimpleQueryForEvaluation(settings.getParams(), 
+              scriptBody, utilityClass);
+        } catch (UnsupportedOperationException e) {
+          LOG.debug("Shoud to evaluate an expression but couln't.");
+          InterpreterResult ret = new InterpreterResult(Code.ERROR, e.getMessage());
+          
+          return ret;
+        }
+      } else {
+        // no evsaluation needed
         script = Input.getSimpleQuery(settings.getParams(), scriptBody);
       }
 
@@ -224,6 +234,19 @@ public class Paragraph extends Job implements Serializable {
     return ret;
   }
 
+  private boolean haveToEval(Map<String, Object> map) {
+    boolean ret = false;
+    
+    Iterator it = map.entrySet().iterator();
+    while (it.hasNext()) {
+      String value = (String) ((Entry) it.next()).getValue();
+      ret = ret || (value.indexOf("eval:") == 0);
+    }
+    
+    return ret;
+    
+  }
+  
   @Override
   protected boolean jobAbort() {
     Interpreter repl = getRepl(getRequiredReplName());

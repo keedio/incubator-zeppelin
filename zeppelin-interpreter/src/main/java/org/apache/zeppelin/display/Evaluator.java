@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Evaluator {
   
-  Logger LOG = LoggerFactory.getLogger(Evaluator.class);
+  private static Logger LOG = LoggerFactory.getLogger(Evaluator.class);
   Class utilityClass;
 
   /**
@@ -55,7 +56,7 @@ public class Evaluator {
    * @param command expression to eval
    * @return
    */
-  public Object eval(String command) {
+  public Object eval(String command) throws UnsupportedOperationException {
 
     Object obj = null;
     
@@ -95,8 +96,12 @@ public class Evaluator {
       obj = expr.evaluate(jc);
     } catch (Exception e) {
       LOG.debug("Error using configured utility class");
+      throw new UnsupportedOperationException("Could not evaluate expression.");
     }
 
+    if (obj == null)
+      throw new UnsupportedOperationException("Could not evaluate expression.");
+    
     return obj;
   }
   
