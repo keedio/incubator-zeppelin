@@ -53,7 +53,7 @@ public class Evaluator {
     Object obj;
     
     try {
-      // Comprobamos si es una expresion a evaluar. En caso contrario enviamos lo que recibimos
+      // Check if expression has to be evaluated.
       if (command.indexOf("eval:") < 0) {
         return command;
       }
