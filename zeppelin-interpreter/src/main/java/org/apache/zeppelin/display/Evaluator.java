@@ -16,10 +16,16 @@
  */
 package org.apache.zeppelin.display;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The evaluator utility class. This class should take an expression string 
@@ -30,6 +36,7 @@ import org.apache.commons.jexl2.MapContext;
  */
 public class Evaluator {
   
+  Logger LOG = LoggerFactory.getLogger(Evaluator.class);
   Class utilityClass;
 
   /**
@@ -50,16 +57,35 @@ public class Evaluator {
    */
   public Object eval(String command) {
 
-    Object obj;
+    Object obj = null;
     
+    // Check if expression has to be evaluated.
+    if (command.indexOf("eval:") < 0) {
+      return command;
+    }
+    
+    String expresionToEval = command.substring(5);
+
     try {
-      // Check if expression has to be evaluated.
-      if (command.indexOf("eval:") < 0) {
-        return command;
-      }
+      Map<String, String> mapFQN = getFQN(expresionToEval);
       
-      String expresionToEval = command.substring(5);
-      
+      // First, we try with fully qualified name
+      JexlEngine jexl = new JexlEngine();
+      String expression = "utils." + mapFQN.get("method");
+      Expression expr = jexl.createExpression(expression);
+      JexlContext jc = new MapContext();
+    
+      jc.set("utils", Class.forName(mapFQN.get("clazz")));
+      obj = expr.evaluate(jc);   
+      if (obj != null) 
+        return obj;
+    } catch (Exception e) {
+      LOG.debug("Error trying to use the FQN class.");
+    }
+
+    // If it fails, we apply the default utility class
+    LOG.debug("Trying the default utility class");
+    try {
       JexlEngine jexl = new JexlEngine();
       String expression = "utils." + expresionToEval;
       Expression expr = jexl.createExpression(expression);
@@ -68,12 +94,28 @@ public class Evaluator {
 
       obj = expr.evaluate(jc);
     } catch (Exception e) {
-      throw new UnsupportedOperationException("Operation not defined, "
-          + "review utility class or update your"
-          + " classpath with the library utility");
+      LOG.debug("Error using configured utility class");
     }
 
     return obj;
+  }
+  
+  private static HashMap<String, String> getFQN(String function) {
+    HashMap<String, String> map = new HashMap<>();
+    String pattern = "(?<clazz>.+\\..+)\\.(?<method>.+)";
+    
+    Pattern regex = Pattern.compile(pattern);
+    Matcher matcher = regex.matcher(function);
+    
+    matcher.find();
+    
+    String matcherClazz = matcher.group("clazz");
+    String matcherMethod = matcher.group("method");
+    
+    map.put("clazz", matcherClazz);
+    map.put("method", matcherMethod);
+    
+    return map;
   }
 
 }

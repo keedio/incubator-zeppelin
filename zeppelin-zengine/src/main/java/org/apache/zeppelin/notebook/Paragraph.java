@@ -210,12 +210,12 @@ public class Paragraph extends Job implements Serializable {
       String utilityClass = ZeppelinConfiguration.create()
           .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "");
       
-      if ("".equals(utilityClass)) {
-        // No utility class so normal behavior
+      //Always try to interpret because could be passed as a FQN class 
+      script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
+      
+      if (script == null) {
+        // Could not evaluate, so trying another way
         script = Input.getSimpleQuery(settings.getParams(), scriptBody);
-      } else {
-        // We have to evaluate methods defined on the utility class
-        script = Input.getSimpleQueryForEvaluation(settings.getParams(), scriptBody, utilityClass);
       }
 
     }
