@@ -108,6 +108,11 @@ public class Evaluator {
     return obj;
   }
   
+  /**
+   * This method extracts the class and the method with arguments from a fully qualified class
+   * @param function FQN class to interpret
+   * @return Map with both clazz and method to execute
+   */
   private static HashMap<String, String> getFQN(String function) {
     HashMap<String, String> map = new HashMap<>();
     String pattern = "(?<clazz>.+\\..+)\\.(?<method>.+)";
