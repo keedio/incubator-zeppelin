@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * The evaluator utility class. This class should take an expression string 
  * and evaluate using the utility class. This class should defined 
  * statics methods in order to interpret them
- * @author rolmo
+ * 
  *
  */
 public class Evaluator {
