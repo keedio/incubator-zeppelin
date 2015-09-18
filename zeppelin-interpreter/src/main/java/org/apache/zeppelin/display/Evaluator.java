@@ -48,7 +48,10 @@ public class Evaluator {
    * @throws InstantiationException 
    */
   public Evaluator(String classImpl) throws Exception {
-    this.utilityClass = Class.forName(classImpl);
+    if ("".endsWith(classImpl))
+      LOG.debug("Only full qualified classes will be executed... Be carefull");
+    else
+      this.utilityClass = Class.forName(classImpl);
   }
   
   /**
