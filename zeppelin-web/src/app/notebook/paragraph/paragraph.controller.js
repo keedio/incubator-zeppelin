@@ -22,8 +22,12 @@ angular.module('zeppelinWebApp')
   $scope.paragraph = null;
   $scope.editor = null;
 
-  var editorMode = {scala: 'ace/mode/scala', sql: 'ace/mode/sql', markdown: 'ace/mode/markdown', 
-		  sh: 'ace/mode/sh'};
+  var editorModes = {
+    'ace/mode/scala': /^%spark/,
+    'ace/mode/sql': /^%(\w*\.)?\wql/,
+    'ace/mode/markdown': /^%md/,
+    'ace/mode/sh': /^%sh/
+  };
 
   // Controller init
   $scope.init = function(newParagraph) {
@@ -39,13 +43,7 @@ angular.module('zeppelinWebApp')
 
     initializeDefault();
 
-    if (!$scope.lastData) {
-      $scope.lastData = {};
-    }
-
     if ($scope.getResultType() === 'TABLE') {
-      $scope.lastData.settings = angular.copy($scope.paragraph.settings);
-      $scope.lastData.config = angular.copy($scope.paragraph.config);
       $scope.loadTableData($scope.paragraph.result);
       $scope.setGraphMode($scope.getGraphMode(), false, false);
     } else if ($scope.getResultType() === 'HTML') {
@@ -66,7 +64,6 @@ angular.module('zeppelinWebApp')
           console.log('HTML rendering error %o', err);
         }
       } else {
-        $timeout(retryRenderer,10);
       }
     };
     $timeout(retryRenderer);
@@ -153,22 +150,17 @@ angular.module('zeppelinWebApp')
   // TODO: this may have impact on performance when there are many paragraphs in a note.
   $scope.$on('updateParagraph', function(event, data) {
     if (data.paragraph.id === $scope.paragraph.id &&
-        (
-      data.paragraph.dateCreated !== $scope.paragraph.dateCreated ||
-      data.paragraph.dateFinished !== $scope.paragraph.dateFinished ||
-      data.paragraph.dateStarted !== $scope.paragraph.dateStarted ||
-      data.paragraph.dateUpdated !== $scope.paragraph.dateUpdated ||
-      data.paragraph.status !== $scope.paragraph.status ||
-      data.paragraph.jobName !== $scope.paragraph.jobName ||
-      data.paragraph.title !== $scope.paragraph.title ||
-      data.paragraph.errorMessage !== $scope.paragraph.errorMessage ||
-      !angular.equals(data.paragraph.settings, $scope.lastData.settings) ||
-      !angular.equals(data.paragraph.config, $scope.lastData.config)
-    )
+        (data.paragraph.dateCreated !== $scope.paragraph.dateCreated ||
+         data.paragraph.dateFinished !== $scope.paragraph.dateFinished ||
+         data.paragraph.dateStarted !== $scope.paragraph.dateStarted ||
+         data.paragraph.dateUpdated !== $scope.paragraph.dateUpdated ||
+         data.paragraph.status !== $scope.paragraph.status ||
+         data.paragraph.jobName !== $scope.paragraph.jobName ||
+         data.paragraph.title !== $scope.paragraph.title ||
+         data.paragraph.errorMessage !== $scope.paragraph.errorMessage ||
+         !angular.equals(data.paragraph.settings, $scope.paragraph.settings) ||
+         !angular.equals(data.paragraph.config, $scope.paragraph.config))
        ) {
-      // store original data for comparison
-      $scope.lastData.settings = angular.copy(data.paragraph.settings);
-      $scope.lastData.config = angular.copy(data.paragraph.config);
 
       var oldType = $scope.getResultType();
       var newType = $scope.getResultType(data.paragraph);
@@ -226,9 +218,9 @@ angular.module('zeppelinWebApp')
         } else {
           $scope.setGraphMode(newGraphMode, false, true);
         }
-      } else if (newType === 'HTML') {
+      } else if (newType === 'HTML' && resultRefreshed) {
         $scope.renderHtml();
-      } else if (newType === 'ANGULAR') {
+      } else if (newType === 'ANGULAR' && resultRefreshed) {
         $scope.renderAngular();
       }
     }
@@ -420,25 +412,30 @@ angular.module('zeppelinWebApp')
   };
 
   $scope.aceChanged = function() {
+
     $scope.dirtyText = $scope.editor.getSession().getValue();
     $scope.startSaveTimer();
+
+    $timeout(function() {
+      $scope.setParagraphMode($scope.editor.getSession(), $scope.dirtyText, $scope.editor.getCursorPosition());
+    });
   };
 
   $scope.aceLoaded = function(_editor) {
     var langTools = ace.require('ace/ext/language_tools');
     var Range = ace.require('ace/range').Range;
 
+    _editor.$blockScrolling = Infinity;
     $scope.editor = _editor;
     if (_editor.container.id !== '{{paragraph.id}}_editor') {
       $scope.editor.renderer.setShowGutter($scope.paragraph.config.lineNumbers);
       $scope.editor.setShowFoldWidgets(false);
       $scope.editor.setHighlightActiveLine(false);
       $scope.editor.setHighlightGutterLine(false);
-      $scope.editor.setTheme('ace/theme/github');
       $scope.editor.setTheme('ace/theme/chrome');
       $scope.editor.focus();
-      var hight = $scope.editor.getSession().getScreenLength() * $scope.editor.renderer.lineHeight + $scope.editor.renderer.scrollBar.getWidth();
-      setEditorHeight(_editor.container.id, hight);
+      var height = $scope.editor.getSession().getScreenLength() * $scope.editor.renderer.lineHeight + $scope.editor.renderer.scrollBar.getWidth();
+      setEditorHeight(_editor.container.id, height);
 
       $scope.editor.getSession().setUseWrapMode(true);
       if (navigator.appVersion.indexOf('Mac') !== -1 ) {
@@ -449,54 +446,66 @@ angular.module('zeppelinWebApp')
         // not applying emacs key binding while the binding override Ctrl-v. default behavior of paste text on windows.
       }
 
-      var sqlModeTest = /^%(\w*\.)?\wql/;
-
-      $scope.setParagraphMode = function(session, paragraphText) {
-        if (sqlModeTest.test(String(paragraphText))) {
-          session.setMode(editorMode.sql);
-        } else if ( String(paragraphText).startsWith('%md')) {
-          session.setMode(editorMode.markdown);
-        } else if ( String(paragraphText).startsWith('%sh')) {
-          session.setMode(editorMode.sh);
-        } else {
-          session.setMode(editorMode.scala);
+      $scope.setParagraphMode = function(session, paragraphText, pos) {
+        // Evaluate the mode only if the first 30 characters of the paragraph have been modified or the the position is undefined.
+        if ( (typeof pos === 'undefined') || (pos.row === 0 && pos.column < 30)) {
+          // If paragraph loading, use config value if exists
+          if ((typeof pos === 'undefined') && $scope.paragraph.config.editorMode) {
+            session.setMode($scope.paragraph.config.editorMode);
+          } else {
+            // Defaults to spark mode
+            var newMode = 'ace/mode/scala';
+            // Test first against current mode
+            var oldMode = session.getMode().$id;
+            if (!editorModes[oldMode] || !editorModes[oldMode].test(paragraphText)) {
+              for (var key in editorModes) {
+                if (key !== oldMode) {
+                  if (editorModes[key].test(paragraphText)){
+                    $scope.paragraph.config.editorMode = key;
+                    session.setMode(key);
+                    return true;
+                  }
+                }
+              }
+              $scope.paragraph.config.editorMode = newMode;
+              session.setMode(newMode);
+            }
+          }
         }
       };
 
       var remoteCompleter = {
-          getCompletions : function(editor, session, pos, prefix, callback) {
-              if (!$scope.editor.isFocused() ){ return;}
+        getCompletions : function(editor, session, pos, prefix, callback) {
+          if (!$scope.editor.isFocused() ){ return;}
 
-              pos = session.getTextRange(new Range(0, 0, pos.row, pos.column)).length;
-              var buf = session.getValue();
+          pos = session.getTextRange(new Range(0, 0, pos.row, pos.column)).length;
+          var buf = session.getValue();
 
-              // ensure the correct mode is set
-              $scope.setParagraphMode(session, buf);
-              websocketMsgSrv.completion($scope.paragraph.id, buf, pos);
+          websocketMsgSrv.completion($scope.paragraph.id, buf, pos);
 
-              $scope.$on('completionList', function(event, data) {
-                  if (data.completions) {
-                      var completions = [];
-                      for (var c in data.completions) {
-                          var v = data.completions[c];
-                          completions.push({
-                              name:v,
-                              value:v,
-                              score:300
-                          });
-                      }
-                      callback(null, completions);
-                  }
-              });
-          }
+          $scope.$on('completionList', function(event, data) {
+            if (data.completions) {
+              var completions = [];
+              for (var c in data.completions) {
+                var v = data.completions[c];
+                completions.push({
+                  name:v,
+                  value:v,
+                  score:300
+                });
+              }
+              callback(null, completions);
+            }
+          });
+        }
       };
 
       langTools.setCompleters([remoteCompleter, langTools.keyWordCompleter, langTools.snippetCompleter, langTools.textCompleter]);
 
       $scope.editor.setOptions({
-          enableBasicAutocompletion: true,
-          enableSnippets: false,
-          enableLiveAutocompletion:false
+        enableBasicAutocompletion: true,
+        enableSnippets: false,
+        enableLiveAutocompletion:false
       });
 
       $scope.handleFocus = function(value) {
@@ -518,8 +527,8 @@ angular.module('zeppelinWebApp')
 
 
       $scope.editor.getSession().on('change', function(e, editSession) {
-        hight = editSession.getScreenLength() * $scope.editor.renderer.lineHeight + $scope.editor.renderer.scrollBar.getWidth();
-        setEditorHeight(_editor.container.id, hight);
+        height = editSession.getScreenLength() * $scope.editor.renderer.lineHeight + $scope.editor.renderer.scrollBar.getWidth();
+        setEditorHeight(_editor.container.id, height);
         $scope.editor.resize();
       });
 
@@ -591,7 +600,7 @@ angular.module('zeppelinWebApp')
 
   $scope.getProgress = function() {
     return ($scope.currentProgress) ? $scope.currentProgress : 0;
-  };                                           
+  };
 
   $scope.getExecutionTime = function() {
     var pdata = $scope.paragraph;
@@ -609,7 +618,7 @@ angular.module('zeppelinWebApp')
     return desc;
   };  
 
-  $scope.isResultOutdated = function() {      
+  $scope.isResultOutdated = function() {
     var pdata = $scope.paragraph;
     if (pdata.dateUpdated !==undefined && Date.parse(pdata.dateUpdated) > Date.parse(pdata.dateStarted)){
       return true;
