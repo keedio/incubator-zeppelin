@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,8 +89,8 @@ public class Input implements Serializable {
     this.options = options;
   }
 
-  public Input(String name, String displayName, String type,
-      Object defaultValue, ParamOption[] options, boolean hidden) {
+  public Input(String name, String displayName, String type, Object defaultValue,
+               ParamOption[] options, boolean hidden) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -244,8 +243,7 @@ public class Input implements Serializable {
 
             String[] optNameArray = getNameAndDisplayName(options[i]);
             if (optNameArray != null) {
-              paramOptions[i] = new ParamOption(optNameArray[0],
-                  optNameArray[1]);
+              paramOptions[i] = new ParamOption(optNameArray[0], optNameArray[1]);
             } else {
               paramOptions[i] = new ParamOption(options[i], null);
             }
@@ -257,8 +255,7 @@ public class Input implements Serializable {
 
       }
 
-      Input param = new Input(varName, displayName, type, defaultValue,
-          paramOptions, hidden);
+      Input param = new Input(varName, displayName, type, defaultValue, paramOptions, hidden);
       params.put(varName, param);
     }
 
@@ -271,8 +268,9 @@ public class Input implements Serializable {
 
     for (String key : params.keySet()) {
       Object value = params.get(key);
-      replaced = replaced.replaceAll("[_]?[$][{]([^:]*[:])?" + key
-          + "([(][^)]*[)])?(=[^}]*)?[}]", value.toString());
+      replaced =
+          replaced.replaceAll("[_]?[$][{]([^:]*[:])?" + key + "([(][^)]*[)])?(=[^}]*)?[}]",
+                              value.toString());
     }
 
     Pattern pattern = Pattern.compile("[$][{]([^=}]*[=][^}]*)[}]");
@@ -286,10 +284,10 @@ public class Input implements Serializable {
         if (optionP > 0) {
           replacement = replacement.substring(0, optionP);
         }
-        replaced = replaced.replaceFirst(
-            "[_]?[$][{]"
-                + m.replaceAll("[(]", ".").replaceAll("[)]", ".")
-                    .replaceAll("[|]", ".") + "[}]", replacement);
+        replaced =
+            replaced.replaceFirst("[_]?[$][{]"
+                + m.replaceAll("[(]", ".").replaceAll("[)]", ".").replaceAll("[|]", ".") + "[}]",
+                replacement);
       } else {
         break;
       }
@@ -375,24 +373,22 @@ public class Input implements Serializable {
   }
 
   public static String[] split(String str, char split) {
-    return split(str, new String[] { String.valueOf(split) }, false);
+    return split(str, new String[] {String.valueOf(split)}, false);
   }
 
-  public static String[] split(String str, String[] splitters,
-      boolean includeSplitter) {
+  public static String[] split(String str, String[] splitters, boolean includeSplitter) {
     String escapeSeq = "\"',;${}";
     char escapeChar = '\\';
 
-    String[] blockStart = new String[] { "\"", "'", "${", "N_(", "N_<" };
-    String[] blockEnd = new String[] { "\"", "'", "}", "N_)", "N_>" };
+    String[] blockStart = new String[] {"\"", "'", "${", "N_(", "N_<"};
+    String[] blockEnd = new String[] {"\"", "'", "}", "N_)", "N_>"};
 
-    return split(str, escapeSeq, escapeChar, blockStart, blockEnd, splitters,
-        includeSplitter);
+    return split(str, escapeSeq, escapeChar, blockStart, blockEnd, splitters, includeSplitter);
 
   }
 
-  public static String[] split(String str, String escapeSeq, char escapeChar,
-      String[] blockStart, String[] blockEnd, String[] splitters,
+  public static String[] split(String str, String escapeSeq, char escapeChar, String[] blockStart,
+             String[] blockEnd, String[] splitters,
       boolean includeSplitter) {
 
     List<String> splits = new ArrayList<String>();
@@ -430,8 +426,7 @@ public class Input implements Serializable {
         boolean multicharBlockDetected = false;
         for (int b = 0; b < blockStart.length; b++) {
           if (blockStartPos >= 0
-              && getBlockStr(blockStart[b]).compareTo(
-                  str.substring(blockStartPos, i)) == 0) {
+              && getBlockStr(blockStart[b]).compareTo(str.substring(blockStartPos, i)) == 0) {
             blockStack.remove(0);
             blockStack.add(0, b);
             multicharBlockDetected = true;
@@ -483,8 +478,7 @@ public class Input implements Serializable {
         for (String splitter : splitters) {
           // forward check for splitter
           int curentLenght = i + splitter.length();
-          if (splitter.compareTo(str.substring(i,
-              Math.min(curentLenght, str.length()))) == 0) {
+          if (splitter.compareTo(str.substring(i, Math.min(curentLenght, str.length()))) == 0) {
             splits.add(curString);
             if (includeSplitter == true) {
               splits.add(splitter);
@@ -505,8 +499,8 @@ public class Input implements Serializable {
 
         // check if block is started
         for (int b = 0; b < blockStart.length; b++) {
-          if (curString.substring(lastEscapeOffset + 1).endsWith(
-              getBlockStr(blockStart[b])) == true) {
+          if (curString.substring(lastEscapeOffset + 1)
+                       .endsWith(getBlockStr(blockStart[b]))) {
             blockStack.add(0, b); // block is started
             blockStartPos = i;
             break;

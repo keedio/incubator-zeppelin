@@ -19,7 +19,6 @@ package org.apache.zeppelin.notebook;
 
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.display.AngularObjectRegistry;
-import org.apache.zeppelin.display.Evaluator;
 import org.apache.zeppelin.display.GUI;
 import org.apache.zeppelin.display.Input;
 import org.apache.zeppelin.interpreter.*;
@@ -31,9 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
+
+import static org.apache.zeppelin.display.Evaluator.EVAL_PREFIX;
 
 /**
  * Paragraph is a representation of an execution unit.
@@ -42,8 +42,10 @@ import java.util.Map.Entry;
  */
 public class Paragraph extends Job implements Serializable {
   private static final transient long serialVersionUID = -6328572073497992016L;
+
   private transient NoteInterpreterLoader replLoader;
   private transient Note note;
+
   private static Logger LOG = LoggerFactory.getLogger(Paragraph.class);
   
   String title;
@@ -190,7 +192,6 @@ public class Paragraph extends Job implements Serializable {
 
   @Override
   protected Object jobRun() throws Throwable {
-    
     String replName = getRequiredReplName();
     Interpreter repl = getRepl(replName);
     logger().info("run paragraph {} using {} " + repl, getId(), replName);
@@ -209,22 +210,27 @@ public class Paragraph extends Job implements Serializable {
                                                                              // from script body
       settings.setForms(inputs);
       
-      if (haveToEval(settings.getParams())) {
+      if (needsEvaluation(settings.getParams())) {
+        /*
+         * User introduced the string "eval:doSomething(...)" in the notebook. We need to
+         * evaluate the expression first.
+         */
+
         try {
-          //include eval tag so hato to eval any function
+          // Resolve the user-provided utility class
           String utilityClass = ZeppelinConfiguration.create()
               .getString("ZEPPELIN_UTILITY_CLASS", "zeppelin.utility.class", "");
           
           script = Input.getSimpleQueryForEvaluation(settings.getParams(), 
               scriptBody, utilityClass);
         } catch (UnsupportedOperationException e) {
-          LOG.debug("Shoud to evaluate an expression but couln't.");
+          LOG.debug("Error while evaluating: " + settings.getParams());
           InterpreterResult ret = new InterpreterResult(Code.ERROR, e.getMessage());
           
           return ret;
         }
       } else {
-        // no evsaluation needed
+        // no evaluation needed, default behaviour.
         script = Input.getSimpleQuery(settings.getParams(), scriptBody);
       }
 
@@ -234,13 +240,18 @@ public class Paragraph extends Job implements Serializable {
     return ret;
   }
 
-  private boolean haveToEval(Map<String, Object> map) {
+  /**
+   * Checks if at least one of the given arguments needs to be evaluated.
+   *
+   * @param map the map of arguments passed by the user in the zeppelin notebook.
+   * @return true if at least one params starts with "eval:", false otherwise.
+   */
+  private boolean needsEvaluation(Map<String, Object> map) {
     boolean ret = false;
-    
-    Iterator it = map.entrySet().iterator();
-    while (it.hasNext()) {
-      String value = (String) ((Entry) it.next()).getValue();
-      ret = ret || (value.indexOf("eval:") == 0);
+
+    for (Object o : map.entrySet()) {
+      String value = (String) ((Entry) o).getValue();
+      ret = ret || value.startsWith(EVAL_PREFIX);
     }
     
     return ret;

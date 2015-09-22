@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.zeppelin.display;
 
 import java.util.HashMap;
@@ -25,53 +26,74 @@ import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The evaluator utility class. This class should take an expression string 
- * and evaluate using the utility class. This class should defined 
- * statics methods in order to interpret them
- * 
+ * The evaluator helper class.
+ *
+ * This class is initialized using the fully qualified name of an
+ * utility class having one or more static methods.
+ *
+ * Example:com.company.custom.udf.UDFUtility
+ *
+ * When an expression of the type: "eval:doSomething(...)" is passed from Zeppelin,
+ * the Evaluator class tries to resolve the something(...) method in the utility class provided
+ * at initialization time.
+ *
+ * Passing an empty utility class at initialization time also works, but then it is mandatory
+ * to use the fully qualified name when writing the expression in Zeppelin.
+ *
+ * Example: eval:com.company.custom.udf.UDFUtility.doSomething(...)
+ *
+ * The command coming from Zeppelin notebook is evaluated using 'commons-jexl'.
  *
  */
 public class Evaluator {
-  
+
+  public static final String EVAL_PREFIX = "eval:";
+  private static final int EVAL_PREFIX_LENGTH = EVAL_PREFIX.length();
+  private static Pattern REGEX = Pattern.compile("(?<clazz>.+\\..+)\\.(?<method>.+)");
+
+
   private static Logger LOG = LoggerFactory.getLogger(Evaluator.class);
   Class utilityClass;
 
   /**
-   * Eval passed expression. Should be defined on Utils class 
-   * @param command Script comman to execute
-   * @return Evaluated expression
-   * @throws IllegalAccessException 
-   * @throws InstantiationException 
+   * Constructs an evaluator class given an user-defined Utility class fully qualified name.
+   *
+   * @param classImpl Utility class containing.
+   * @throws ClassNotFoundException if utility class is not in the classpath.
    */
-  public Evaluator(String classImpl) throws Exception {
-    if ("".endsWith(classImpl))
-      LOG.debug("Only full qualified classes will be executed... Be carefull");
+  public Evaluator(String classImpl) throws ClassNotFoundException {
+    if (StringUtils.isEmpty(classImpl))
+      LOG.debug("Only full qualified expressions will be executed... Be careful!");
     else
       this.utilityClass = Class.forName(classImpl);
   }
   
   /**
-   * Eval the expression passed as argument
+   * Evaluates the given command coming verbatim from Zeppelin notebook.
+   *
+   * The command coming from Zeppelin notebook is evaluated using 'commons-jexl'.
+   *
    * @param command expression to eval
-   * @return
+   * @return the result of
    */
   public Object eval(String command) throws UnsupportedOperationException {
 
     Object obj = null;
     
     // Check if expression has to be evaluated.
-    if (command.indexOf("eval:") < 0) {
+    if (!command.startsWith(EVAL_PREFIX)) {
       return command;
     }
     
-    String expresionToEval = command.substring(5);
+    String expressionToEval = command.substring(EVAL_PREFIX_LENGTH);
 
     try {
-      Map<String, String> mapFQN = getFQN(expresionToEval);
+      Map<String, String> mapFQN = getFQN(expressionToEval);
       
       // First, we try with fully qualified name
       JexlEngine jexl = new JexlEngine();
@@ -91,7 +113,7 @@ public class Evaluator {
     LOG.debug("Trying the default utility class");
     try {
       JexlEngine jexl = new JexlEngine();
-      String expression = "utils." + expresionToEval;
+      String expression = "utils." + expressionToEval;
       Expression expr = jexl.createExpression(expression);
       JexlContext jc = new MapContext();
       jc.set("utils", utilityClass);
@@ -109,16 +131,14 @@ public class Evaluator {
   }
   
   /**
-   * This method extracts the class and the method with arguments from a fully qualified class
+   * This method extracts the class and the method with arguments from a fully qualified class.
+   *
    * @param function FQN class to interpret
    * @return Map with both clazz and method to execute
    */
   private static HashMap<String, String> getFQN(String function) {
     HashMap<String, String> map = new HashMap<>();
-    String pattern = "(?<clazz>.+\\..+)\\.(?<method>.+)";
-    
-    Pattern regex = Pattern.compile(pattern);
-    Matcher matcher = regex.matcher(function);
+    Matcher matcher = REGEX.matcher(function);
     
     matcher.find();
     
