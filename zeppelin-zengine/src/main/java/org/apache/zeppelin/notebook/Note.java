@@ -89,6 +89,10 @@ public class Note implements Serializable, JobListener {
   public String id() {
     return id;
   }
+  
+  public String getId() {
+    return id;
+  }
 
   public String getName() {
     return name;
@@ -139,6 +143,17 @@ public class Note implements Serializable, JobListener {
     return p;
   }
 
+  /**
+   * Add the paragraph p to the list of paras in note.
+   *
+   * @param p
+   */
+  public void addParagraph(Paragraph p) {
+    synchronized (paragraphs) {
+      paragraphs.add(p);
+    }
+  }
+  
   /**
    * Insert paragraph in given index.
    *
