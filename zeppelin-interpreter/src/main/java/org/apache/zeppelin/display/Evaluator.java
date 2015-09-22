@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
  *
  * Example:com.company.custom.udf.UDFUtility
  *
+ * Utility class is resolved using ZEPPELIN_UTILITY_CLASS nv variable or 'zeppelin.utility.class' JVM property.
+ *
  * When an expression of the type: "eval:doSomething(...)" is passed from Zeppelin,
  * the Evaluator class tries to resolve the something(...) method in the utility class provided
  * at initialization time.
