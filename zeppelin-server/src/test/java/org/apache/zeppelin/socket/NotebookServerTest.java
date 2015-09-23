@@ -19,35 +19,31 @@
  */
 package org.apache.zeppelin.socket;
 
-import org.apache.zeppelin.notebook.Note;
-import org.apache.zeppelin.server.ZeppelinServer;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
-
+import static org.junit.Assert.*;
 import java.io.IOException;
+import org.junit.Test;
+
 import java.net.UnknownHostException;
+import java.net.InetAddress;
 
 /**
  * BASIC Zeppelin rest api tests
- *
- *
- * @author joelz
- *
  */
-    public class NotebookServerTests {
+public class NotebookServerTest {
 
-    @Test
-    public void CheckOrigin() throws UnknownHostException {
-        NotebookServer server = new NotebookServer();
-         Assert.assertTrue(server.checkOrigin(new TestHttpServletRequest(),
-                 "http://" + java.net.InetAddress.getLocalHost().getHostName() + ":8080"));
-    }
+  @Test
+  public void checkOrigin() throws UnknownHostException {
+    NotebookServer server = new NotebookServer();
+    String origin = "http://" + InetAddress.getLocalHost().getHostName() + ":8080";
 
-    @Test
-    public void CheckInvalidOrigin(){
-        NotebookServer server = new NotebookServer();
-        Assert.assertFalse(server.checkOrigin(new TestHttpServletRequest(), "http://evillocalhost:8080"));
-    }
+    assertTrue("Origin " + origin + " is not allowed. Please check your hostname.",
+          server.checkOrigin(new TestHttpServletRequest(), origin));
+  }
+
+  @Test
+  public void checkInvalidOrigin(){
+    NotebookServer server = new NotebookServer();
+    assertFalse(server.checkOrigin(new TestHttpServletRequest(), "http://evillocalhost:8080"));
+  }
 }
+

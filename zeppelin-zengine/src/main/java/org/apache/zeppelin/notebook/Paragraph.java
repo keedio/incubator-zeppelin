@@ -40,7 +40,7 @@ import static org.apache.zeppelin.display.Evaluator.EVAL_PREFIX;
  *
  * @author Leemoonsoo
  */
-public class Paragraph extends Job implements Serializable {
+public class Paragraph extends Job implements Serializable, Cloneable {
   private static final transient long serialVersionUID = -6328572073497992016L;
 
   private transient NoteInterpreterLoader replLoader;
@@ -322,6 +322,23 @@ public class Paragraph extends Job implements Serializable {
   public void setReturn(InterpreterResult value, Throwable t) {
     setResult(value);
     setException(t);
-
+  }
+  
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    Paragraph paraClone = (Paragraph) super.clone();
+    Map<String, Object> config = new HashMap<>(this.getConfig());
+    // Show the editor by default
+    String hideEditorKey = "editorHide";
+    Object object = config.get(hideEditorKey);
+    if (object != null && object == Boolean.TRUE) {
+      config.put(hideEditorKey, Boolean.FALSE);
+    }
+    Map<String, Object> param = new HashMap<>(this.settings.getParams());
+    paraClone.setConfig(config);
+    paraClone.settings.setParams(param);
+    paraClone.setTitle(this.getTitle());
+    paraClone.setText(this.getText());
+    return paraClone;
   }
 }

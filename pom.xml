@@ -86,16 +86,19 @@
   <modules>
     <module>zeppelin-interpreter</module>
     <module>zeppelin-zengine</module>
+    <module>spark-dependencies</module>
     <module>spark</module>
     <module>markdown</module>
     <module>angular</module>
     <module>shell</module>
     <module>hive</module>
+    <module>phoenix</module>
     <module>geode</module>
     <module>postgresql</module>
     <module>tajo</module>
     <module>flink</module>
     <module>ignite</module>
+    <module>kylin</module>
     <module>lens</module>
     <module>cassandra</module>
     <module>zeppelin-web</module>
@@ -309,7 +312,7 @@
         <executions>
           <execution>
             <id>copy-dependencies</id>
-            <phase>prepare-package</phase>
+            <phase>process-test-resources</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
@@ -401,6 +404,7 @@
           <version>0.11</version>
           <configuration>
             <excludes>
+              <exclude>**/*.keywords</exclude>
               <exclude>**/.idea/</exclude>
               <exclude>**/*.iml</exclude>
               <exclude>.git/</exclude>
