@@ -20,9 +20,11 @@ package org.apache.zeppelin.display;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,9 +89,8 @@ public class Input implements Serializable {
     this.options = options;
   }
 
-
   public Input(String name, String displayName, String type, Object defaultValue,
-      ParamOption[] options, boolean hidden) {
+               ParamOption[] options, boolean hidden) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -148,7 +149,6 @@ public class Input implements Serializable {
     return hidden;
   }
 
-
   private static String[] getNameAndDisplayName(String str) {
     Pattern p = Pattern.compile("([^(]*)\\s*[(]([^)]*)[)]");
     Matcher m = p.matcher(str.trim());
@@ -203,7 +203,6 @@ public class Input implements Serializable {
         valuePart = null;
       }
 
-
       String varName;
       String displayName = null;
       String type = null;
@@ -249,7 +248,6 @@ public class Input implements Serializable {
               paramOptions[i] = new ParamOption(options[i], null);
             }
           }
-
 
         } else { // no option
           defaultValue = valuePart;
@@ -300,6 +298,65 @@ public class Input implements Serializable {
   }
 
 
+  /**
+   * This method is similar to getSimpleQuery. Main differences are that params
+   * argument is not changed at all, and the method look for expressions to eval 
+   * on the params map (the value will starts with 'eval:')
+   * @param params
+   * @param script
+   * @param classUtility This is the utility class used to eval expressions. The utility
+   * class should define the statisc methods to interpret
+   * @return
+   * @throws Exception
+   */
+  public static String getSimpleQueryForEvaluation(Map<String, Object> params, String script
+      , String classUtility) throws Exception {
+    String replaced = script;
+    Evaluator evaluator = new Evaluator(classUtility);
+    
+    // Recorremos todos los parametros evaluando sii es posible
+    Iterator entrySet = params.entrySet().iterator();
+    Map<String, Object> aux = new HashMap<String, Object>();
+    while (entrySet.hasNext()) {
+      Entry thisEntry = (Entry) entrySet.next();
+      String key = thisEntry.getKey().toString();
+      String value = thisEntry.getValue().toString();
+      aux.put(key, evaluator.eval(value));
+    }
+
+    for (String key : aux.keySet()) {
+      Object value = aux.get(key);
+      if (value == null) continue;
+      replaced = replaced.replaceAll("[_]?[$][{]([^:]*[:])?" + key
+          + "([(][^)]*[)])?(=[^}]*)?[}]", value.toString());
+    }
+
+    Pattern pattern = Pattern.compile("[$][{]([^=}]*[=][^}]*)[}]");
+    while (true) {
+      Matcher match = pattern.matcher(replaced);
+      if (match != null && match.find()) {
+        String m = match.group(1);
+        int p = m.indexOf('=');
+        String replacement = m.substring(p + 1);
+        int optionP = replacement.indexOf(",");
+        if (optionP > 0) {
+          replacement = replacement.substring(0, optionP);
+        }
+        replaced = replaced.replaceFirst(
+            "[_]?[$][{]"
+                + m.replaceAll("[(]", ".").replaceAll("[)]", ".")
+                    .replaceAll("[|]", ".") + "[}]", replacement);
+      } else {
+        break;
+      }
+    }
+
+    replaced = replaced.replace("[_]?[$][{]([^=}]*)[}]", "");
+    return replaced;
+  }
+  
+  
+  
   public static String[] split(String str) {
     return str.split(";(?=([^\"']*\"[^\"']*\")*[^\"']*$)");
 
@@ -310,7 +367,6 @@ public class Input implements Serializable {
    * str.split("\\|(?=([^\"']*\"[^\"']*\")*[^\"']*$)"); return
    * str.split("\\|(?=([^\"']*\"[^\"']*\")*[^\"']*$)"); }
    */
-
 
   public static String[] splitPipe(String str) {
     return split(str, '|');
@@ -332,7 +388,8 @@ public class Input implements Serializable {
   }
 
   public static String[] split(String str, String escapeSeq, char escapeChar, String[] blockStart,
-      String[] blockEnd, String[] splitters, boolean includeSplitter) {
+             String[] blockEnd, String[] splitters,
+      boolean includeSplitter) {
 
     List<String> splits = new ArrayList<String>();
 
@@ -443,7 +500,7 @@ public class Input implements Serializable {
         // check if block is started
         for (int b = 0; b < blockStart.length; b++) {
           if (curString.substring(lastEscapeOffset + 1)
-                       .endsWith(getBlockStr(blockStart[b])) == true) {
+                       .endsWith(getBlockStr(blockStart[b]))) {
             blockStack.add(0, b); // block is started
             blockStartPos = i;
             break;
