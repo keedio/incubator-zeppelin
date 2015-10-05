@@ -30,7 +30,9 @@ angular.module('zeppelinWebApp', [
     'angular.filter',
     'monospaced.elastic',
     'puElasticInput',
-    'xeditable'
+    'xeditable',
+    'datamaps',
+    'app.util'
   ])
   .filter('breakFilter', function() {
     return function (text) {
@@ -60,4 +62,7 @@ angular.module('zeppelinWebApp', [
       .otherwise({
         redirectTo: '/'
       });
-  });
+  })
+  .factory('_', ['$window', function($window) {
+    return $window._; // assumes underscore has already been loaded on the page
+  }]);

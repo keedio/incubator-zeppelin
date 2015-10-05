@@ -17,7 +17,7 @@
 
 angular.module('zeppelinWebApp')
   .controller('ParagraphCtrl', function($scope,$rootScope, $route, $window, $element, $routeParams, $location,
-                                         $timeout, $compile, websocketMsgSrv) {
+                                         $timeout, $compile, websocketMsgSrv, _, DatamapsService) {
 
   $scope.paragraph = null;
   $scope.editor = null;
@@ -732,8 +732,10 @@ angular.module('zeppelinWebApp')
 
       if (!type || type === 'table') {
         setTable($scope.paragraph.result, refresh);
-      }
-      else {
+      } else if (!type || type === 'mapChart') {
+        //setup new chart type
+        setMapChart(type, $scope.paragraph.result, refresh);
+      } else {
         setD3Chart(type, $scope.paragraph.result, refresh);
       }
     }
@@ -836,6 +838,13 @@ angular.module('zeppelinWebApp')
     $timeout(retryRenderer);
 
   };
+
+
+  var setMapChart = function(type, data, refresh) { 
+    var aux = DatamapsService.getData(data, $scope.paragraph.config.graph.keys[0].name, $scope.paragraph.config.graph.values[0].name);
+    DatamapsService.draw(aux, $scope.paragraph.id);
+  };
+
 
   var setD3Chart = function(type, data, refresh) {
     if (!$scope.chart[type]) {

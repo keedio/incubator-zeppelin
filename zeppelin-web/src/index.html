@@ -37,7 +37,7 @@ limitations under the License.
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/nvd3/src/nv.d3.css" />
+    <link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css" />
     <link rel="stylesheet" href="bower_components/perfect-scrollbar/src/perfect-scrollbar.css" />
     <link rel="stylesheet" href="bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="bower_components/angular-xeditable/dist/css/xeditable.css" />
@@ -99,7 +99,7 @@ limitations under the License.
     <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
     <script src="bower_components/jquery.scrollTo/jquery.scrollTo.js"></script>
     <script src="bower_components/d3/d3.js"></script>
-    <script src="bower_components/nvd3/nv.d3.js"></script>
+    <script src="bower_components/nvd3/build/nv.d3.js"></script>
     <script src="bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
     <script src="bower_components/perfect-scrollbar/src/perfect-scrollbar.js"></script>
@@ -110,6 +110,11 @@ limitations under the License.
     <script src="bower_components/highlightjs/highlight.pack.js"></script>
     <script src="bower_components/lodash/lodash.js"></script>
     <script src="bower_components/angular-filter/dist/angular-filter.min.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/topojson/topojson.js"></script>
+    <script src="bower_components/keedio-datamps/dist/datamaps.all.js"></script>
+    <script src="bower_components/datamaps/dist/datamaps.all.js"></script>
+    <script src="bower_components/angular-datamaps/dist/angular-datamaps.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js({.tmp,src}) scripts/scripts.js -->
@@ -119,6 +124,9 @@ limitations under the License.
     <script src="app/notebook/notebook.controller.js"></script>
     <script src="app/interpreter/interpreter.controller.js"></script>
     <script src="app/notebook/paragraph/paragraph.controller.js"></script>
+    <script src="app/util/main.module.js"></script>    
+    <script src="app/util/util.module.js"></script>
+    <script src="app/util/util.datamaps.service.js"></script>
     <script src="components/navbar/navbar.controller.js"></script>
     <script src="components/ngescape/ngescape.directive.js"></script>
     <script src="components/noteName-create/notename.controller.js"></script>
@@ -131,6 +139,7 @@ limitations under the License.
     <script src="components/websocketEvents/websocketEvents.factory.js"></script>
     <script src="components/notebookListDataFactory/notebookList.datafactory.js"></script>
     <script src="components/baseUrl/baseUrl.service.js"></script>
+
     <!-- endbuild -->
   </body>
 </html>

@@ -129,6 +129,11 @@ limitations under the License.
                 ng-class="{'active': isGraphMode('scatterChart')}"
                 ng-click="setGraphMode('scatterChart', true)"><i class="cf cf-scatter-chart"></i>
         </button>
+	      <button type="button" class="btn btn-default btn-sm"
+		            ng-class="{'active': isGraphMode('mapChart')}"
+		            ng-click="setGraphMode('mapChart', true)"><i class="fa fa-globe"></i>
+	      </button>
+
       </div>
       <span ng-if="getResultType()=='TABLE' && getGraphMode()!='table' && !asIframe && !viewOnly"
             style="margin-left:10px; cursor:pointer; display: inline-block; vertical-align:top; position: relative; line-height:30px;">
@@ -176,7 +181,7 @@ limitations under the License.
               </ul>
             </span>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4" ng-if="getGraphMode()!='mapChart'">
             <span class="columns lightBold">
               Groups
               <ul data-drop="true"
@@ -293,7 +298,10 @@ limitations under the License.
             </span>
           </div>
         </div>
+      </div>
 
+      <div ng-if="getGraphMode()=='mapChart'" id="p{{paragraph.id}}_mapChart">
+        <svg></svg>
       </div>
 
 
