@@ -15,7 +15,11 @@
 
 'use strict';
 
-angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv) {
+angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http) {
+  $rootScope.ticket = {
+    'principal':'anonymous',
+    'ticket':'anonymous'
+  };
   /** Current list of notes (ids) */
 
   var vm = this;
@@ -25,7 +29,7 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
   vm.arrayOrderingSrv = arrayOrderingSrv;
   
   $('#notebook-list').perfectScrollbar({suppressScrollX: true});
-  
+
   $scope.$on('setNoteMenu', function(event, notes) {
     notebookListDataFactory.setNotes(notes);
   });
@@ -38,13 +42,23 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
     websocketMsgSrv.getNotebookList();
   }
 
+  /** ask for a ticket for websocket access
+   * Shiro will require credentials here
+   * */
+  $http.get('/api/security/ticket').
+    success(function(ticket, status, headers, config) {
+      $rootScope.ticket = angular.fromJson(ticket).body;
+      vm.loadNotes = loadNotes;
+      vm.isActive = isActive;
+
+      vm.loadNotes();
+    }).
+    error(function(data, status, headers, config) {
+      console.log('Could not get ticket');
+    });
+
   function isActive(noteId) {
     return ($routeParams.noteId === noteId);
   }
-
-  vm.loadNotes = loadNotes;
-  vm.isActive = isActive;
-
-  vm.loadNotes();
 
 });

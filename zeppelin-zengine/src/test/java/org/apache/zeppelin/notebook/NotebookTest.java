@@ -45,21 +45,20 @@ import org.junit.Test;
 import org.quartz.SchedulerException;
 
 public class NotebookTest implements JobListenerFactory{
-
-	private File tmpDir;
-	private ZeppelinConfiguration conf;
-	private SchedulerFactory schedulerFactory;
-	private File notebookDir;
-	private Notebook notebook;
-	private NotebookRepo notebookRepo;
+  private File tmpDir;
+  private ZeppelinConfiguration conf;
+  private SchedulerFactory schedulerFactory;
+  private File notebookDir;
+  private Notebook notebook;
+  private NotebookRepo notebookRepo;
   private InterpreterFactory factory;
 
-	@Before
-	public void setUp() throws Exception {
-		tmpDir = new File(System.getProperty("java.io.tmpdir")+"/ZeppelinLTest_"+System.currentTimeMillis());
-		tmpDir.mkdirs();
-		new File(tmpDir, "conf").mkdirs();
-		notebookDir = new File(System.getProperty("java.io.tmpdir")+"/ZeppelinLTest_"+System.currentTimeMillis()+"/notebook");
+  @Before
+  public void setUp() throws Exception {
+    tmpDir = new File(System.getProperty("java.io.tmpdir")+"/ZeppelinLTest_"+System.currentTimeMillis());
+	tmpDir.mkdirs();
+	new File(tmpDir, "conf").mkdirs();
+	notebookDir = new File(System.getProperty("java.io.tmpdir")+"/ZeppelinLTest_"+System.currentTimeMillis()+"/notebook");
 		notebookDir.mkdirs();
 
     System.setProperty(ConfVars.ZEPPELIN_HOME.getVarName(), tmpDir.getAbsolutePath());
@@ -86,7 +85,7 @@ public class NotebookTest implements JobListenerFactory{
 
 	@Test
 	public void testSelectingReplImplementation() throws IOException {
-		Note note = notebook.createNote();
+		Note note = notebook.createNote("anonymous");
 		note.getNoteReplLoader().setInterpreters(factory.getDefaultInterpreterSettingList());
 
 		// run with defatul repl
@@ -106,7 +105,7 @@ public class NotebookTest implements JobListenerFactory{
 
 	@Test
 	public void testPersist() throws IOException, SchedulerException{
-		Note note = notebook.createNote();
+		Note note = notebook.createNote("anonymous");
 
 		// run with default repl
 		Paragraph p1 = note.addParagraph();
@@ -119,7 +118,7 @@ public class NotebookTest implements JobListenerFactory{
 
 	@Test
 	public void testRunAll() throws IOException {
-		Note note = notebook.createNote();
+		Note note = notebook.createNote("anonymous");
     note.getNoteReplLoader().setInterpreters(factory.getDefaultInterpreterSettingList());
 
 		Paragraph p1 = note.addParagraph();
@@ -136,7 +135,7 @@ public class NotebookTest implements JobListenerFactory{
 	@Test
 	public void testSchedule() throws InterruptedException, IOException{
 		// create a note and a paragraph
-		Note note = notebook.createNote();
+		Note note = notebook.createNote("anonymous");
     note.getNoteReplLoader().setInterpreters(factory.getDefaultInterpreterSettingList());
 
 		Paragraph p = note.addParagraph();
@@ -148,7 +147,7 @@ public class NotebookTest implements JobListenerFactory{
 		Map<String, Object> config = note.getConfig();
 		config.put("cron", "* * * * * ?");
 		note.setConfig(config);
-		notebook.refreshCron(note.id());
+		notebook.refreshCron(note.id(), "anonymous");
 		Thread.sleep(1*1000);
 		dateFinished = p.getDateFinished();
 		assertNotNull(dateFinished);
@@ -156,7 +155,7 @@ public class NotebookTest implements JobListenerFactory{
 		// remove cron scheduler.
 		config.put("cron", null);
 		note.setConfig(config);
-		notebook.refreshCron(note.id());
+		notebook.refreshCron(note.id(), "anonymous");
 		Thread.sleep(1*1000);
 		assertEquals(dateFinished, p.getDateFinished());
 	}
@@ -165,7 +164,7 @@ public class NotebookTest implements JobListenerFactory{
   public void testAngularObjectRemovalOnNotebookRemove() throws InterruptedException,
       IOException {
     // create a note and a paragraph
-    Note note = notebook.createNote();
+    Note note = notebook.createNote("anonymous");
     note.getNoteReplLoader().setInterpreters(factory.getDefaultInterpreterSettingList());
 
     AngularObjectRegistry registry = note.getNoteReplLoader()
@@ -178,7 +177,7 @@ public class NotebookTest implements JobListenerFactory{
     registry.add("o2", "object2", null);
 
     // remove notebook
-    notebook.removeNote(note.id());
+    notebook.removeNote(note.id(), "anonymous");
 
     // local object should be removed
     assertNull(registry.get("o1", note.id()));
@@ -190,7 +189,7 @@ public class NotebookTest implements JobListenerFactory{
   public void testAngularObjectRemovalOnInterpreterRestart() throws InterruptedException,
       IOException {
     // create a note and a paragraph
-    Note note = notebook.createNote();
+    Note note = notebook.createNote("anonymous");
     note.getNoteReplLoader().setInterpreters(factory.getDefaultInterpreterSettingList());
 
     AngularObjectRegistry registry = note.getNoteReplLoader()
@@ -211,7 +210,7 @@ public class NotebookTest implements JobListenerFactory{
     // local and global scope object should be removed
     assertNull(registry.get("o1", note.id()));
     assertNull(registry.get("o2", null));
-    notebook.removeNote(note.id());
+    notebook.removeNote(note.id(), "anonymous");
   }
 
 	private void delete(File file){

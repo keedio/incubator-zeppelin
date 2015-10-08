@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.zeppelin.interpreter.InterpreterSetting;
 import org.apache.zeppelin.notebook.Notebook;
 import org.apache.zeppelin.rest.message.InterpreterSettingListForNoteBind;
@@ -62,8 +63,10 @@ public class NotebookRestApi {
   @PUT
   @Path("interpreter/bind/{noteId}")
   public Response bind(@PathParam("noteId") String noteId, String req) throws IOException {
+    String principal = getPrincipal();
+
     List<String> settingIdList = gson.fromJson(req, new TypeToken<List<String>>(){}.getType());
-    notebook.bindInterpretersToNote(noteId, settingIdList);
+    notebook.bindInterpretersToNote(noteId, settingIdList, principal);
     return new JsonResponse(Status.OK).build();
   }
 
@@ -73,10 +76,13 @@ public class NotebookRestApi {
   @GET
   @Path("interpreter/bind/{noteId}")
   public Response bind(@PathParam("noteId") String noteId) {
-    List<InterpreterSettingListForNoteBind> settingList
-      = new LinkedList<InterpreterSettingListForNoteBind>();
+    String principal = getPrincipal();
 
-    List<InterpreterSetting> selectedSettings = notebook.getBindedInterpreterSettings(noteId);
+    List<InterpreterSettingListForNoteBind> settingList =
+      new LinkedList<InterpreterSettingListForNoteBind>();
+
+    List<InterpreterSetting> selectedSettings =
+            notebook.getBindedInterpreterSettings(noteId, principal);
     for (InterpreterSetting setting : selectedSettings) {
       settingList.add(new InterpreterSettingListForNoteBind(
           setting.id(),
@@ -109,4 +115,9 @@ public class NotebookRestApi {
     }
     return new JsonResponse(Status.OK, "", settingList).build();
   }
+
+  private String getPrincipal() {
+    return SecurityUtils.getSubject().getPrincipal().toString();
+  }
+
 }

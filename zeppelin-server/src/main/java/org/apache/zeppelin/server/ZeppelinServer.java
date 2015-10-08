@@ -41,6 +41,7 @@ import org.apache.zeppelin.rest.NotebookRestApi;
 import org.apache.zeppelin.rest.ZeppelinRestApi;
 import org.apache.zeppelin.scheduler.SchedulerFactory;
 import org.apache.zeppelin.socket.NotebookServer;
+import org.apache.zeppelin.rest.SecurityRestApi;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -99,8 +100,13 @@ public class ZeppelinServer extends Application {
     jettyServer.setHandler(contexts);
 
     LOG.info("Start zeppelin server");
-    jettyServer.start();
-    LOG.info("Started");
+    try {
+      jettyServer.start();
+    } catch (Exception e) {
+      LOG.error("Error while running jettyServer", e);
+      System.exit(-1);
+    }
+    LOG.info("Started zeppelin server");
 
     Runtime.getRuntime().addShutdownHook(new Thread(){
       @Override public void run() {
@@ -216,6 +222,12 @@ public class ZeppelinServer extends Application {
 
     cxfContext.addFilter(new FilterHolder(CorsFilter.class), "/*",
         EnumSet.allOf(DispatcherType.class));
+
+    cxfContext.addFilter(org.apache.shiro.web.servlet.ShiroFilter.class, "/*",
+        EnumSet.allOf(DispatcherType.class));
+
+    cxfContext.addEventListener(new org.apache.shiro.web.env.EnvironmentLoaderListener());
+
     return cxfContext;
   }
 
@@ -259,7 +271,7 @@ public class ZeppelinServer extends Application {
   }
 
   @Override
-  public java.util.Set<java.lang.Object> getSingletons() {
+  public Set<Object> getSingletons() {
     Set<Object> singletons = new HashSet<Object>();
 
     /** Rest-api root endpoint */
@@ -271,6 +283,9 @@ public class ZeppelinServer extends Application {
 
     InterpreterRestApi interpreterApi = new InterpreterRestApi(replFactory);
     singletons.add(interpreterApi);
+
+    SecurityRestApi securityApi = new SecurityRestApi();
+    singletons.add(securityApi);
 
     return singletons;
   }

@@ -18,15 +18,7 @@
 package org.apache.zeppelin.notebook;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.conf.ZeppelinConfiguration.ConfVars;
@@ -59,7 +51,7 @@ public class Notebook {
   private SchedulerFactory schedulerFactory;
   private InterpreterFactory replFactory;
   /** Keep the order. */
-  Map<String, Note> notes = new LinkedHashMap<String, Note>();
+  Map<String, Map<String, Note>> notes = new LinkedHashMap<String, Map<String, Note>>();
   private ZeppelinConfiguration conf;
   private StdSchedulerFactory quertzSchedFact;
   private org.quartz.Scheduler quartzSched;
@@ -89,29 +81,38 @@ public class Notebook {
    * @return
    * @throws IOException
    */
-  public Note createNote() throws IOException {
+  public Note createNote(String principal) throws IOException {
     if (conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_AUTO_INTERPRETER_BINDING)) {
-      return createNote(replFactory.getDefaultInterpreterSettingList());
+      return createNote(replFactory.getDefaultInterpreterSettingList(), principal);
     } else {
-      return createNote(null);
+      return createNote(null, principal);
     }
   }
 
+  private Map<String, Note> getUserNotes(String principal) {
+    synchronized (notes) {
+      Map<String, Note> userNotes = notes.get(principal);
+      if (userNotes == null)
+        userNotes = new HashMap<>();
+      notes.put(principal, userNotes);
+      return userNotes;
+    }
+  }
   /**
    * Create new note.
    *
    * @return
    * @throws IOException
    */
-  public Note createNote(List<String> interpreterIds) throws IOException {
+  public Note createNote(List<String> interpreterIds, String principal) throws IOException {
     NoteInterpreterLoader intpLoader = new NoteInterpreterLoader(replFactory);
-    Note note = new Note(notebookRepo, intpLoader, jobListenerFactory);
+    Note note = new Note(notebookRepo, intpLoader, jobListenerFactory, principal);
     intpLoader.setNoteId(note.id());
     synchronized (notes) {
-      notes.put(note.id(), note);
+      getUserNotes(principal).put(note.id(), note);
     }
     if (interpreterIds != null) {
-      bindInterpretersToNote(note.id(), interpreterIds);
+      bindInterpretersToNote(note.id(), interpreterIds, principal);
     }
 
     note.persist();
@@ -119,16 +120,16 @@ public class Notebook {
   }
 
   public void bindInterpretersToNote(String id,
-      List<String> interpreterSettingIds) throws IOException {
-    Note note = getNote(id);
+      List<String> interpreterSettingIds, String principal) throws IOException {
+    Note note = getNote(id, principal);
     if (note != null) {
       note.getNoteReplLoader().setInterpreters(interpreterSettingIds);
       replFactory.putNoteInterpreterSettingBinding(id, interpreterSettingIds);
     }
   }
 
-  public List<String> getBindedInterpreterSettingsIds(String id) {
-    Note note = getNote(id);
+  public List<String> getBindedInterpreterSettingsIds(String id, String principal) {
+    Note note = getNote(id, principal);
     if (note != null) {
       return note.getNoteReplLoader().getInterpreters();
     } else {
@@ -136,8 +137,8 @@ public class Notebook {
     }
   }
 
-  public List<InterpreterSetting> getBindedInterpreterSettings(String id) {
-    Note note = getNote(id);
+  public List<InterpreterSetting> getBindedInterpreterSettings(String id, String principal) {
+    Note note = getNote(id, principal);
     if (note != null) {
       return note.getNoteReplLoader().getInterpreterSettings();
     } else {
@@ -145,16 +146,16 @@ public class Notebook {
     }
   }
 
-  public Note getNote(String id) {
+  public Note getNote(String id, String principal) {
     synchronized (notes) {
-      return notes.get(id);
+      return getUserNotes(principal).get(id);
     }
   }
 
-  public void removeNote(String id) {
+  public void removeNote(String id, String principal) {
     Note note;
     synchronized (notes) {
-      note = notes.remove(id);
+      note = getUserNotes(principal).remove(id);
     }
 
     // remove from all interpreter instance's angular object registry
@@ -174,10 +175,10 @@ public class Notebook {
     }
   }
 
-  private Note loadNoteFromRepo(String id) {
+  private Note loadNoteFromRepo(String id, String owner) {
     Note note = null;
     try {
-      note = notebookRepo.get(id);
+      note = notebookRepo.get(id, owner);
     } catch (IOException e) {
       logger.error("Failed to load " + id, e);
     }
@@ -231,8 +232,8 @@ public class Notebook {
     }
 
     synchronized (notes) {
-      notes.put(note.id(), note);
-      refreshCron(note.id());
+      getUserNotes(owner).put(note.id(), note);
+      refreshCron(note.id(), owner);
     }
 
     for (String name : angularObjectSnapshot.keySet()) {
@@ -257,9 +258,8 @@ public class Notebook {
 
   private void loadAllNotes() throws IOException {
     List<NoteInfo> noteInfos = notebookRepo.list();
-
     for (NoteInfo info : noteInfos) {
-      loadNoteFromRepo(info.getId());
+      loadNoteFromRepo(info.getId(), info.getOwner());
     }
   }
 
@@ -287,9 +287,38 @@ public class Notebook {
     }
   }
 
+  public List<Note> getAllNotes(String principal) {
+    synchronized (notes) {
+      List<Note> noteList = new ArrayList<>(getUserNotes(principal).values());
+      Collections.sort(noteList, new Comparator() {
+        @Override
+        public int compare(Object one, Object two) {
+          Note note1 = (Note) one;
+          Note note2 = (Note) two;
+
+          String name1 = note1.id();
+          if (note1.getName() != null) {
+            name1 = note1.getName();
+          }
+          String name2 = note2.id();
+          if (note2.getName() != null) {
+            name2 = note2.getName();
+          }
+          ((Note) one).getName();
+          return name1.compareTo(name2);
+        }
+      });
+      return noteList;
+    }
+  }
+
   public List<Note> getAllNotes() {
     synchronized (notes) {
-      List<Note> noteList = new ArrayList<Note>(notes.values());
+      Collection<Map<String, Note>> usersNotes = notes.values();
+      List<Note> noteList = new ArrayList<>();
+      for (Map<String, Note> userNotes : usersNotes) {
+        noteList.addAll(userNotes.values());
+      }
       Collections.sort(noteList, new Comparator() {
         @Override
         public int compare(Object one, Object two) {
@@ -331,18 +360,18 @@ public class Notebook {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-
+      String principal = context.getJobDetail().getJobDataMap().getString("principal");
       String noteId = context.getJobDetail().getJobDataMap().getString("noteId");
-      Note note = notebook.getNote(noteId);
+      Note note = notebook.getNote(noteId, principal);
       note.runAll();
     }
   }
 
-  public void refreshCron(String id) {
+  public void refreshCron(String id, String principal) {
     removeCron(id);
     synchronized (notes) {
 
-      Note note = notes.get(id);
+      Note note = getUserNotes(principal).get(id);
       if (note == null) {
         return;
       }
@@ -358,8 +387,11 @@ public class Notebook {
 
 
       JobDetail newJob =
-          JobBuilder.newJob(CronJob.class).withIdentity(id, "note").usingJobData("noteId", id)
-          .build();
+          JobBuilder.newJob(CronJob.class)
+            .withIdentity(id, "note")
+            .usingJobData("noteId", id)
+            .usingJobData("principal", principal)
+                  .build();
 
       Map<String, Object> info = note.getInfo();
       info.put("cron", null);
