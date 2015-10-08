@@ -133,7 +133,14 @@ limitations under the License.
 		            ng-class="{'active': isGraphMode('mapChart')}"
 		            ng-click="setGraphMode('mapChart', true)"><i class="fa fa-globe"></i>
 	      </button>
-
+        <button type="button" class="btn btn-default btn-sm"
+                ng-class="{'active': isGraphMode('leafletMap')}"
+                ng-click="setGraphMode('leafletMap', true)"><i class="fa fa-map-pin"></i>
+        </button>
+        <button type="button" class="btn btn-default btn-sm"
+                ng-class="{'active': isGraphMode('multiple')}"
+                ng-click="setGraphMode('multiple', true)"><i class="fa fa-list-ol"></i>
+        </button>
       </div>
       <span ng-if="getResultType()=='TABLE' && getGraphMode()!='table' && !asIframe && !viewOnly"
             style="margin-left:10px; cursor:pointer; display: inline-block; vertical-align:top; position: relative; line-height:30px;">
@@ -165,7 +172,11 @@ limitations under the License.
           </ul>
         </div>
 
-        <div class="row" ng-if="getGraphMode()!='scatterChart'">
+        <ng-include src="'app/components/datamap/form.html'" ng-if="getGraphMode()=='mapChart'"></ng-include>
+        <ng-include src="'app/components/leaflet/form.html'" ng-if="getGraphMode()=='leafletMap'"></ng-include>
+        <ng-include src="'app/components/multiple/form.html'" ng-if="getGraphMode()=='multiple'"></ng-include>
+
+        <div class="row" ng-if="getGraphMode()!='scatterChart' && getGraphMode()!='mapChart' && getGraphMode()!='leafletMap' && getGraphMode()!='multiple'">
           <div class="col-md-4">
             <span class="columns lightBold">
               Keys
@@ -181,7 +192,7 @@ limitations under the License.
               </ul>
             </span>
           </div>
-          <div class="col-md-4" ng-if="getGraphMode()!='mapChart'">
+          <div class="col-md-4">
             <span class="columns lightBold">
               Groups
               <ul data-drop="true"
@@ -300,9 +311,6 @@ limitations under the License.
         </div>
       </div>
 
-      <div ng-if="getGraphMode()=='mapChart'" id="p{{paragraph.id}}_mapChart">
-        <svg></svg>
-      </div>
 
 
       <div id="p{{paragraph.id}}_graph"
@@ -341,6 +349,17 @@ limitations under the License.
              id="p{{paragraph.id}}_scatterChart">
           <svg></svg>
         </div>
+
+        <div ng-show="getGraphMode()=='mapChart'" id="p{{paragraph.id}}_mapChart">
+        </div>
+
+        <div ng-show="getGraphMode()=='leafletMap'" id="p{{paragraph.id}}_mapLeaflet">
+        </div>
+        
+        <div ng-show="getGraphMode()=='multiple'" id="p{{paragraph.id}}_multiple">
+          <div></div>
+        </div>
+
       </div>
 
       <div id="{{paragraph.id}}_comment"
@@ -374,7 +393,7 @@ limitations under the License.
       </img>
 
       <div id="{{paragraph.id}}_error"
-           class="error"
+           class="alert alert-danger" role="alert"
            ng-if="paragraph.status == 'ERROR'"
            ng-bind="paragraph.errorMessage">
       </div>

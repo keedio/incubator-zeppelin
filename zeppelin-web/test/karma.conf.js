@@ -58,6 +58,9 @@ module.exports = function(config) {
       'bower_components/keedio-datamps/dist/datamaps.all.js',
       'bower_components/datamaps/dist/datamaps.all.js',
       'bower_components/angular-datamaps/dist/angular-datamaps.min.js',
+      'bower_components/leaflet/dist/leaflet-src.js',
+      'bower_components/Leaflet.MakiMarkers/Leaflet.MakiMarkers.js',
+      'bower_components/c3/c3.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/app/app.js',

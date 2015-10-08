@@ -36,12 +36,15 @@ limitations under the License.
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css" />
     <link rel="stylesheet" href="bower_components/perfect-scrollbar/src/perfect-scrollbar.css" />
     <link rel="stylesheet" href="bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="bower_components/angular-xeditable/dist/css/xeditable.css" />
     <link rel="stylesheet" href="bower_components/highlightjs/styles/github.css" />
+    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="bower_components/c3/c3.css" />
     <!-- endbower -->
     <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/all.css" />
     <!-- endbuild -->
@@ -115,6 +118,9 @@ limitations under the License.
     <script src="bower_components/keedio-datamps/dist/datamaps.all.js"></script>
     <script src="bower_components/datamaps/dist/datamaps.all.js"></script>
     <script src="bower_components/angular-datamaps/dist/angular-datamaps.min.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
+    <script src="bower_components/Leaflet.MakiMarkers/Leaflet.MakiMarkers.js"></script>
+    <script src="bower_components/c3/c3.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js({.tmp,src}) scripts/scripts.js -->
@@ -124,9 +130,15 @@ limitations under the License.
     <script src="app/notebook/notebook.controller.js"></script>
     <script src="app/interpreter/interpreter.controller.js"></script>
     <script src="app/notebook/paragraph/paragraph.controller.js"></script>
-    <script src="app/util/main.module.js"></script>    
-    <script src="app/util/util.module.js"></script>
-    <script src="app/util/util.datamaps.service.js"></script>
+    <script src="app/components/main.module.js"></script>    
+    <script src="app/components/datamap/main.datamap.module.js"></script>
+    <script src="app/components/datamap/DatamapService.js"></script>
+    <script src="app/components/leaflet/main.leaflet.module.js"></script>
+    <script src="app/components/leaflet/LeafletService.js"></script>    
+    <script src="app/components/utility/main.utility.module.js"></script>
+    <script src="app/components/utility/PivotService.js"></script>
+    <script src="app/components/multiple/main.multiple.module.js"></script>
+    <script src="app/components/multiple/MultipleService.js"></script>    
     <script src="components/navbar/navbar.controller.js"></script>
     <script src="components/ngescape/ngescape.directive.js"></script>
     <script src="components/noteName-create/notename.controller.js"></script>

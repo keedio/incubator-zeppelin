@@ -17,13 +17,23 @@
 
 angular.module('zeppelinWebApp')
   .controller('ParagraphCtrl', function($scope,$rootScope, $route, $window, $element, $routeParams, $location,
-                                         $timeout, $compile, websocketMsgSrv, _, DatamapsService) {
+                                         $timeout, $compile, websocketMsgSrv, _, DatamapService, PivotService, LeafletService, MultipleService) {
 
   $scope.paragraph = null;
   $scope.editor = null;
 
   var editorMode = {scala: 'ace/mode/scala', sql: 'ace/mode/sql', markdown: 'ace/mode/markdown', 
 		  sh: 'ace/mode/sh'};
+
+  $scope.onlyOneItem = {
+    accept: function(dragEl) {
+      if ($scope.list1.length >= 2) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  } 
 
   // Controller init
   $scope.init = function(newParagraph) {
@@ -130,6 +140,26 @@ angular.module('zeppelinWebApp')
     if (!config.graph.scatter) {
       config.graph.scatter = {};
     }
+
+    if (!config.graph.latitude) {
+      config.graph.latitude = []; 
+    }
+
+    if (!config.graph.longitude) {
+      config.graph.longitude = [];
+    }
+
+    if (!config.graph.text) {
+      config.graph.text = [];
+    }
+
+    if (!config.graph.xserie) {
+      config.graph.xserie = [];
+    }
+
+     if (!config.graph.yseries) {
+      config.graph.yseries = [];
+    }       
   };
 
   $scope.getIframeDimensions = function () {
@@ -735,6 +765,10 @@ angular.module('zeppelinWebApp')
       } else if (!type || type === 'mapChart') {
         //setup new chart type
         setMapChart(type, $scope.paragraph.result, refresh);
+      } else if (!type || type === 'leafletMap') { 
+        setLeafletMap(type, $scope.paragraph.result, refresh);
+      } else if (!type || type === 'multiple') { 
+        setMultiple(type, $scope.paragraph.result, refresh);
       } else {
         setD3Chart(type, $scope.paragraph.result, refresh);
       }
@@ -841,10 +875,107 @@ angular.module('zeppelinWebApp')
 
 
   var setMapChart = function(type, data, refresh) { 
-    var aux = DatamapsService.getData(data, $scope.paragraph.config.graph.keys[0].name, $scope.paragraph.config.graph.values[0].name);
-    DatamapsService.draw(aux, $scope.paragraph.id);
+    var aux;
+    try {
+      aux = DatamapService.getData(data, $scope.paragraph.config.graph.keys[0].name, $scope.paragraph.config.graph.values[0].name);
+    } catch (err) {
+      DatamapService.undraw('p' + $scope.paragraph.id + '_mapChart')
+      $scope.paragraph.status = 'ERROR';
+      $scope.paragraph.errorMessage = 'No data available';
+      return;
+    }
+    
+    var id = $scope.paragraph.jobName;
+
+    var renderTable = function() {
+      DatamapService.draw(aux, 'p' + $scope.paragraph.id + '_mapChart')
+    };
+
+    var retryRenderer = function() {
+      if ($('#p'+$scope.paragraph.id+'_mapChart').length) {
+        try {
+          renderTable();
+        } catch(err) {
+          console.log('Chart drawing error %o', err);
+        }
+      } else {
+        $timeout(retryRenderer,10);
+      }
+    };
+    $timeout(retryRenderer);
+
   };
 
+  var setLeafletMap = function(type, data, refresh) { 
+    // Si no están todos los datos necesarios para pintar
+    var lat, lon, txt, val;
+
+    try {
+      lat = $scope.paragraph.config.graph.latitude[0].name;
+      lon = $scope.paragraph.config.graph.longitude[0].name;
+      txt = $scope.paragraph.config.graph.text[0].name;
+      val = $scope.paragraph.config.graph.values[0].name;
+    } catch (err) {
+      LeafletService.undraw('p' + $scope.paragraph.id + '_mapLeaflet')
+      $scope.paragraph.status = 'ERROR';
+      $scope.paragraph.errorMessage = 'No data available';
+      return;
+    }
+
+    var json = PivotService.crossData(data);
+/*
+    try {
+      PivotService.validateType(json, $scope.paragraph.config.graph.latitude[0].name, 'number');
+    } catch (err) {
+      $scope.paragraph.status = 'ERROR';
+      $scope.paragraph.errorMessage = err;
+      return;    
+    }
+*/
+    var renderTable = function() {
+      LeafletService.draw(json, '#p'+$scope.paragraph.id+'_mapLeaflet',
+        lat,
+        lon,
+        val,
+        txt
+        )
+    };
+
+    var retryRenderer = function() {
+      if ($('#p'+$scope.paragraph.id+'_mapLeaflet').length) {
+        try {
+          renderTable();
+        } catch(err) {
+          console.log('Chart drawing error %o', err);
+        }
+      } else {
+        $timeout(retryRenderer,10);
+      }
+    };
+    $timeout(retryRenderer);
+  };
+
+  var setMultiple = function(type, data, refresh) { 
+    var json = PivotService.crossData(data); 
+    var idDiv = '#p'+$scope.paragraph.id+'_multiple div';
+
+    var renderTable = function() {
+      MultipleService.draw(json, idDiv, $scope.paragraph.config.graph.xserie[0], $scope.paragraph.config.graph.yseries);
+    };
+
+    var retryRenderer = function() {
+      if ($('#p'+$scope.paragraph.id+'_multiple').length) {
+        try {
+          renderTable();
+        } catch(err) {
+          console.log('Chart drawing error %o', err);
+        }
+      } else {
+        $timeout(retryRenderer,10);
+      }
+    };
+    $timeout(retryRenderer);
+  }
 
   var setD3Chart = function(type, data, refresh) {
     if (!$scope.chart[type]) {
@@ -987,8 +1118,38 @@ angular.module('zeppelinWebApp')
     $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
   };
 
+  $scope.removeGraphOptionXSerie = function(idx) {
+    $scope.paragraph.config.graph.xserie.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.removeGraphOptionYSerie = function(idx) {
+    $scope.paragraph.config.graph.yseries.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
   $scope.removeGraphOptionKeys = function(idx) {
     $scope.paragraph.config.graph.keys.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.removeGraphOptionLatitude = function(idx) {
+    $scope.paragraph.config.graph.latitude.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.removeGraphOptionLongitude = function(idx) {
+    $scope.paragraph.config.graph.longitude.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.removeGraphOptionText = function(idx) {
+    $scope.paragraph.config.graph.text.splice(idx, 1);
     clearUnknownColsFromGraphOption();
     $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
   };
@@ -1007,6 +1168,12 @@ angular.module('zeppelinWebApp')
 
   $scope.setGraphOptionValueAggr = function(idx, aggr) {
     $scope.paragraph.config.graph.values[idx].aggr = aggr;
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.setGraphOptionValueType = function(idx, type) {
+    $scope.paragraph.config.graph.yseries[idx].type = type;
     clearUnknownColsFromGraphOption();
     $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
   };
@@ -1103,6 +1270,10 @@ angular.module('zeppelinWebApp')
 
     if ($scope.paragraph.config.graph.values.length === 0 && $scope.paragraph.result.columnNames.length > 1) {
       $scope.paragraph.config.graph.values.push($scope.paragraph.result.columnNames[1]);
+    }
+
+    if ($scope.paragraph.config.graph.longitude.length === 0 && $scope.paragraph.result.columnNames.length > 1) {
+      $scope.paragraph.config.graph.longitude.push($scope.paragraph.result.columnNames[1]);
     }
 
     if (!$scope.paragraph.config.graph.scatter.xAxis && !$scope.paragraph.config.graph.scatter.yAxis) {

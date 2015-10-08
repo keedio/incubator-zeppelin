@@ -32,7 +32,7 @@ angular.module('zeppelinWebApp', [
     'puElasticInput',
     'xeditable',
     'datamaps',
-    'app.util'
+    'app.module'
   ])
   .filter('breakFilter', function() {
     return function (text) {
