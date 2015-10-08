@@ -141,6 +141,10 @@ limitations under the License.
                 ng-class="{'active': isGraphMode('multiple')}"
                 ng-click="setGraphMode('multiple', true)"><i class="fa fa-list-ol"></i>
         </button>
+        <button type="button" class="btn btn-default btn-sm"
+                ng-class="{'active': isGraphMode('pivot')}"
+                ng-click="setGraphMode('pivot', true)"><i class="fa fa-magic"></i>
+        </button>
       </div>
       <span ng-if="getResultType()=='TABLE' && getGraphMode()!='table' && !asIframe && !viewOnly"
             style="margin-left:10px; cursor:pointer; display: inline-block; vertical-align:top; position: relative; line-height:30px;">
@@ -156,7 +160,7 @@ limitations under the License.
 
       <div class="option lightBold" style="overflow: visible;"
          ng-if="getResultType()=='TABLE' && getGraphMode()!='table'
-         && paragraph.config.graph.optionOpen && !asIframe && !viewOnly">
+         && paragraph.config.graph.optionOpen && !asIframe && !viewOnly && getGraphMode()!='pivot'">
         All fields:
         <div class="allFields row">
           <ul class="noDot">
@@ -176,7 +180,7 @@ limitations under the License.
         <ng-include src="'app/components/leaflet/form.html'" ng-if="getGraphMode()=='leafletMap'"></ng-include>
         <ng-include src="'app/components/multiple/form.html'" ng-if="getGraphMode()=='multiple'"></ng-include>
 
-        <div class="row" ng-if="getGraphMode()!='scatterChart' && getGraphMode()!='mapChart' && getGraphMode()!='leafletMap' && getGraphMode()!='multiple'">
+        <div class="row" ng-if="getGraphMode()!='scatterChart' && getGraphMode()!='mapChart' && getGraphMode()!='leafletMap' && getGraphMode()!='multiple' && getGraphMode()!='pivot'">
           <div class="col-md-4">
             <span class="columns lightBold">
               Keys
@@ -358,6 +362,10 @@ limitations under the License.
         
         <div ng-show="getGraphMode()=='multiple'" id="p{{paragraph.id}}_multiple">
           <div></div>
+        </div>
+
+        <div ng-show="getGraphMode()=='pivot'" id="p{{paragraph.id}}_pivot">
+          <div style="{z-index: -1}"></div>
         </div>
 
       </div>

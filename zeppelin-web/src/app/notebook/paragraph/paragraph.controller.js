@@ -769,6 +769,8 @@ angular.module('zeppelinWebApp')
         setLeafletMap(type, $scope.paragraph.result, refresh);
       } else if (!type || type === 'multiple') { 
         setMultiple(type, $scope.paragraph.result, refresh);
+      } else if (!type || type === 'pivot') { 
+        setPivot(type, $scope.paragraph.result, refresh);
       } else {
         setD3Chart(type, $scope.paragraph.result, refresh);
       }
@@ -975,6 +977,15 @@ angular.module('zeppelinWebApp')
       }
     };
     $timeout(retryRenderer);
+  }
+
+  var setPivot = function(type, data, refresh) {
+    var json = PivotService.crossData(data); 
+    var derivers = $.pivotUtilities.derivers;
+    var renderers = $.extend($.pivotUtilities.renderers, 
+                    $.pivotUtilities.gchart_renderers);    
+
+    $('#p'+$scope.paragraph.id+'_pivot>div').pivotUI(json, {renderers: renderers}, true);
   }
 
   var setD3Chart = function(type, data, refresh) {

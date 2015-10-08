@@ -61,6 +61,9 @@ module.exports = function(config) {
       'bower_components/leaflet/dist/leaflet-src.js',
       'bower_components/Leaflet.MakiMarkers/Leaflet.MakiMarkers.js',
       'bower_components/c3/c3.js',
+      'bower_components/jqueryui/jquery-ui.js',
+      'bower_components/pivottable/dist/pivot.js',
+      'bower_components/webcomponentsjs/webcomponents.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/app/app.js',
