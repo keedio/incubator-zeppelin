@@ -922,12 +922,12 @@ angular.module('zeppelinWebApp')
       }
       if (type !== 'pieChart') {
         $scope.chart[type].yAxis.tickFormat(function(d) {
-                                              var format = d3.format(".2f");
+                                              var format = d3.format('.2f');
                                               var prefix = d3.formatPrefix(d);
-                                              return format(prefix.scale(d)) + " " + prefix.symbol;
+                                              return format(prefix.scale(d)) + ' ' + prefix.symbol;
                                             });                  
         $scope.chart[type].margin({left: 60});
-      };
+      }
     }
 
     var renderChart = function() {
