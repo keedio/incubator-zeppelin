@@ -83,6 +83,23 @@ angular.module('zeppelinWebApp')
 
   };
 
+  $scope.renderHighchart = function(result) {
+    var retryRenderer = function() {
+      if ($('#p'+$scope.paragraph.id+'_chart').length) {
+        try {
+          $('#p'+$scope.paragraph.id+'_chart').highcharts(JSON.parse(result.msg));
+
+        } catch(err) {
+          console.log('HTML rendering error %o', err);
+        }
+      } else {
+        $timeout(retryRenderer,10);
+      }
+    };
+    $timeout(retryRenderer);
+
+  };  
+
   $scope.renderAngular = function() {
     var retryRenderer = function() {
       if (angular.element('#p'+$scope.paragraph.id+'_angular').length) {
@@ -260,6 +277,8 @@ angular.module('zeppelinWebApp')
         $scope.renderHtml();
       } else if (newType === 'ANGULAR') {
         $scope.renderAngular();
+      } else if (newType === 'HIGHCHART') {
+        $scope.renderHighchart($scope.paragraph.result);
       }
     }
   });

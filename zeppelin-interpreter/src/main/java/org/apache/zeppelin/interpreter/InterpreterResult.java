@@ -54,7 +54,8 @@ public class InterpreterResult implements Serializable {
     TABLE,
     IMG,
     SVG,
-    NULL
+    NULL,
+    HIGHCHART
   }
 
   Code code;

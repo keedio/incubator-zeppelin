@@ -315,7 +315,13 @@ limitations under the License.
         </div>
       </div>
 
-
+      <div id="p{{paragraph.id}}_chart"
+           class="graphContainer"
+           ng-class="{'noOverflow': getGraphMode()=='highchart'}"
+           ng-if="getResultType()=='HIGHCHART'"
+           allowresize="{{!asIframe && !viewOnly}}"
+           resizable on-resize="setGraphHeight();">
+      </div>
 
       <div id="p{{paragraph.id}}_graph"
            class="graphContainer"
