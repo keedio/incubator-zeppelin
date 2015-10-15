@@ -15,3 +15,16 @@
 @import url(//fonts.googleapis.com/css?family=Patua+One);
 @import url(//fonts.googleapis.com/css?family=Roboto);
 @import url(//fonts.googleapis.com/css?family=Source+Code+Pro);
+
+@font-face {
+    font-family: Octopus;
+    src: url(../../fonts/Octopus_Wide_500.otf);
+}
+@font-face {
+    font-family: Dsignes Light;
+    src: url(../../fonts/DsignesL.ttf);
+}
+@font-face {
+    font-family: Dsignes Bold;
+    src: url(../../fonts/DsignesB.ttf);
+}
