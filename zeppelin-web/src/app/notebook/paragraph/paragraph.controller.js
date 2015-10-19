@@ -850,6 +850,7 @@ angular.module('zeppelinWebApp')
     if (!$scope.chart[type]) {
       var chart = nv.models[type]();
       $scope.chart[type] = chart;
+      $scope.chart[type].color(['#666484', '#55A08E']);
     }
 
     var d3g = [];
@@ -928,6 +929,14 @@ angular.module('zeppelinWebApp')
         $scope.chart[type].yAxis.axisLabelDistance(50);
         $scope.chart[type].useInteractiveGuideline(true); // for better UX and performance issue. (https://github.com/novus/nvd3/issues/691)
         $scope.chart[type].forceY([0]); // force y-axis minimum to 0 for line chart.
+      }
+      if (type !== 'pieChart') {
+        $scope.chart[type].yAxis.tickFormat(function(d) {
+                                              var format = d3.format('.2f');
+                                              var prefix = d3.formatPrefix(d);
+                                              return format(prefix.scale(d)) + ' ' + prefix.symbol;
+                                            });                  
+        $scope.chart[type].margin({left: 60});
       }
     }
 
