@@ -198,6 +198,9 @@ a.navbar-brand:hover {
   color: #fff !important;
 }
 
+.server-connected {
+  color: #55A08E;
+}
 
 /* ****************************************************************************
  * Home.
@@ -276,6 +279,72 @@ a.navbar-brand:hover {
   border-radius: 12px;
 }
 
+.table-condensed > thead > tr > th {
+  color: #666484;
+  font-family: Dsignes Bold;
+  background-color: #C2C3C8;
+}
+
+.table-condensed > tr {
+  color: #666484;
+  font-family: Dsignes Light;
+}
+
+.table-condensed > tr:hover {
+  background-color: #C2C3C8;
+}
+
+.paragraph .control {
+  background-color: rgba(255,255,255,0.85);
+  /*display: none;*/
+  float: right;
+  font-family: Dsignes Bold;
+  color: #666484;
+  margin-top: 1px;
+  margin-right: 5px;
+  position:absolute;
+  clear:both;
+  right:15px;
+  top: 16px;
+  text-align:right;
+  font-size:12px;
+  border: none;
+  border-radius: 12px;
+}
+
+.paragraph .control li{
+  font-size:12px;
+  margin-bottom:4px;
+  font-family: Dsignes Bold;
+  color: #352B5B;
+}
+
+.paragraph .runControl {
+  font-size: 1px;
+  color: #9A999D;
+  height:4px;
+  margin: 1px 0px 0px 0px;
+}
+
+.paragraph .runControl .progress {
+  position: relative;
+  width:100%;
+  height:4px;
+  z-index:100;
+  border-radius: 0px;
+}
+
+.paragraph .runControl .progress .progress-bar {
+  z-index:100;
+  background-color: #55A08E;
+}
+
+.paragraph .executionTime {
+  color: #352B5B;
+  font-size: 10px;
+  font-family: Dsignes Bold;
+}
+
 /* ****************************************************************************
  * Modal Window.
  * ***************************************************************************/
@@ -293,7 +362,7 @@ a.navbar-brand:hover {
   color: #434142;
   text-align: right;
   white-space: nowrap;
-  font: Dsignes Light;
+  font-family: Dsignes Light;
   font-weight: bold;
 }
 
@@ -302,7 +371,7 @@ a.navbar-brand:hover {
   background-color: #55A08E;
   background-image: none;
   border: 0;
-  font: Dsignes Light;
+  font-family: Dsignes Light;
   font-weight: bold;
 }
 
@@ -313,7 +382,7 @@ kbd {
   background-repeat: repeat-x;
   display: inline-block;
   padding: 4px 5px;
-  font: 11px Dsignes Light;
+  font-family: 11px Dsignes Light;
   font-weight: bold;
   line-height: 10px;
   color: #000;
