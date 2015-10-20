@@ -342,15 +342,13 @@ public class Notebook {
   }
 
   /**
-   * Get all shared notes. All those notes which owners's list is
-   * greater than one, because all notes have a default owner (aka
-   * principal or notes's creator).
+   * Get all shared notes.
    * @return
    */
   public List<Note> getAllSharedNotes(){
     List<Note> noteList = new ArrayList<>();
     for (Note note : this.getAllNotes()){
-      if (note.getOwners().size() > 1) {
+      if (note.getIsShared()) {
         noteList.add(note);
       } else {
         continue;
@@ -360,7 +358,7 @@ public class Notebook {
   }
 
   /**
-   * Get all the shared notes a user is owner.
+   * Get all the shared notes of which a user is owner.
    * @param principal
    * @return
    */
@@ -470,6 +468,13 @@ public class Notebook {
     return conf;
   }
 
+  /**
+   *
+   * @param id
+   * @param principal
+   * @param newPrincipal
+   * @return
+   */
   public boolean shareNote(String id, String principal, String newPrincipal){
     boolean isShared = false;
     try {
