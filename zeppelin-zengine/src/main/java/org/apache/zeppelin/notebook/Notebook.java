@@ -51,7 +51,7 @@ public class Notebook {
   private SchedulerFactory schedulerFactory;
   private InterpreterFactory replFactory;
   /** Keep the order. */
-  Map<String, Map<String, Note>> notes = new LinkedHashMap<>();
+  Map<String, Map<String, Note>> notes = new LinkedHashMap<String, Map<String, Note>>();
   private ZeppelinConfiguration conf;
   private StdSchedulerFactory quertzSchedFact;
   private org.quartz.Scheduler quartzSched;
@@ -59,9 +59,9 @@ public class Notebook {
   private NotebookRepo notebookRepo;
 
   public Notebook(ZeppelinConfiguration conf, NotebookRepo notebookRepo,
-      SchedulerFactory schedulerFactory,
-      InterpreterFactory replFactory, JobListenerFactory jobListenerFactory) throws IOException,
-      SchedulerException {
+                  SchedulerFactory schedulerFactory,
+                  InterpreterFactory replFactory, JobListenerFactory jobListenerFactory) throws IOException,
+          SchedulerException {
     this.conf = conf;
     this.notebookRepo = notebookRepo;
     this.schedulerFactory = schedulerFactory;
@@ -119,8 +119,40 @@ public class Notebook {
     return note;
   }
 
+  /**
+   * Clone existing note.
+   * @param sourceNoteID - the note ID to clone
+   * @param newNoteName - the name of the new note
+   * @return noteId
+   * @throws IOException, CloneNotSupportedException, IllegalArgumentException
+   */
+  public Note cloneNote(String sourceNoteID, String newNoteName, String principal) throws
+          IOException, CloneNotSupportedException, IllegalArgumentException {
+
+    Note sourceNote = getNote(sourceNoteID, principal);
+    if (sourceNote == null) {
+      throw new IllegalArgumentException(sourceNoteID + "not found");
+    }
+    Note newNote = createNote(principal);
+    if (newNoteName != null) {
+      newNote.setName(newNoteName);
+    }
+    // Copy the interpreter bindings
+    List<String> boundInterpreterSettingsIds =
+            getBindedInterpreterSettingsIds(sourceNote.id(), principal);
+    bindInterpretersToNote(newNote.id(), boundInterpreterSettingsIds, principal);
+
+    List<Paragraph> paragraphs = sourceNote.getParagraphs();
+    for (Paragraph para : paragraphs) {
+      Paragraph p = (Paragraph) para.clone();
+      newNote.addParagraph(p);
+    }
+    newNote.persist();
+    return newNote;
+  }
+
   public void bindInterpretersToNote(String id,
-      List<String> interpreterSettingIds, String principal) throws IOException {
+                                     List<String> interpreterSettingIds, String principal) throws IOException {
     Note note = getNote(id, principal);
     if (note != null) {
       note.getNoteReplLoader().setInterpreters(interpreterSettingIds);
@@ -188,7 +220,7 @@ public class Notebook {
 
     // set NoteInterpreterLoader
     NoteInterpreterLoader noteInterpreterLoader = new NoteInterpreterLoader(
-        replFactory);
+            replFactory);
     note.setReplLoader(noteInterpreterLoader);
     noteInterpreterLoader.setNoteId(note.id());
 
@@ -199,14 +231,14 @@ public class Notebook {
     note.setNotebookRepo(notebookRepo);
 
     Map<String, SnapshotAngularObject> angularObjectSnapshot =
-        new HashMap<String, SnapshotAngularObject>();
+            new HashMap<String, SnapshotAngularObject>();
 
     // restore angular object --------------
     Date lastUpdatedDate = new Date(0);
     for (Paragraph p : note.getParagraphs()) {
       p.setNote(note);
       if (p.getDateFinished() != null &&
-          lastUpdatedDate.before(p.getDateFinished())) {
+              lastUpdatedDate.before(p.getDateFinished())) {
         lastUpdatedDate = p.getDateFinished();
       }
     }
@@ -221,11 +253,11 @@ public class Notebook {
           SnapshotAngularObject snapshot = angularObjectSnapshot.get(savedObject.getName());
           if (snapshot == null || snapshot.getLastUpdate().before(lastUpdatedDate)) {
             angularObjectSnapshot.put(
-                savedObject.getName(),
-                new SnapshotAngularObject(
-                    intpGroupName,
-                    savedObject,
-                    lastUpdatedDate));
+                    savedObject.getName(),
+                    new SnapshotAngularObject(
+                            intpGroupName,
+                            savedObject,
+                            lastUpdatedDate));
           }
         }
       }
@@ -246,7 +278,7 @@ public class Notebook {
           String noteId = snapshot.getAngularObject().getNoteId();
           // at this point, remote interpreter process is not created.
           // so does not make sense add it to the remote.
-          // 
+          //
           // therefore instead of addAndNotifyRemoteProcess(), need to use add()
           // that results add angularObject only in ZeppelinServer side not remoteProcessSide
           registry.add(name, snapshot.getAngularObject().get(), noteId);
@@ -263,13 +295,30 @@ public class Notebook {
     }
   }
 
+  /**
+   * Reload all notes from repository after clearing `notes`
+   * to reflect the changes of added/deleted/modified notebooks on file system level.
+   *
+   * @return
+   * @throws IOException
+   */
+  private void reloadAllNotes() throws IOException {
+    synchronized (notes) {
+      notes.clear();
+    }
+    List<NoteInfo> noteInfos = notebookRepo.list();
+    for (NoteInfo info : noteInfos) {
+      loadNoteFromRepo(info.getId(), info.getOwner());
+    }
+  }
+
   class SnapshotAngularObject {
     String intpGroupId;
     AngularObject angularObject;
     Date lastUpdate;
 
     public SnapshotAngularObject(String intpGroupId,
-        AngularObject angularObject, Date lastUpdate) {
+                                 AngularObject angularObject, Date lastUpdate) {
       super();
       this.intpGroupId = intpGroupId;
       this.angularObject = angularObject;
@@ -313,6 +362,13 @@ public class Notebook {
   }
 
   public List<Note> getAllNotes() {
+    if (conf.getBoolean(ConfVars.ZEPPELIN_NOTEBOOK_RELOAD_FROM_STORAGE)) {
+      try {
+        reloadAllNotes();
+      } catch (IOException e) {
+        logger.error("Cannot reload notes from storage", e);
+      }
+    }
     synchronized (notes) {
       Collection<Map<String, Note>> usersNotes = notes.values();
       List<Note> noteList = new ArrayList<>();
@@ -339,39 +395,6 @@ public class Notebook {
       });
       return noteList;
     }
-  }
-
-  /**
-   * Get all shared notes.
-   * @return
-   */
-  public List<Note> getAllSharedNotes(){
-    List<Note> noteList = new ArrayList<>();
-    for (Note note : this.getAllNotes()){
-      if (note.getIsShared()) {
-        noteList.add(note);
-      } else {
-        continue;
-      }
-    }
-    return noteList;
-  }
-
-  /**
-   * Get all the shared notes of which a user is owner.
-   * @param principal
-   * @return
-   */
-  public List<Note> getAllSharedNotes(String principal){
-    List<Note> noteList = new ArrayList<>();
-    for (Note note: this.getAllSharedNotes()){
-      if (note.getOwners().contains(principal)){
-        noteList.add(note);
-      } else {
-        continue;
-      }
-    }
-    return noteList;
   }
 
   public JobListenerFactory getJobListenerFactory() {
@@ -420,11 +443,11 @@ public class Notebook {
 
 
       JobDetail newJob =
-          JobBuilder.newJob(CronJob.class)
-            .withIdentity(id, "note")
-            .usingJobData("noteId", id)
-            .usingJobData("principal", principal)
-                  .build();
+              JobBuilder.newJob(CronJob.class)
+                      .withIdentity(id, "note")
+                      .usingJobData("noteId", id)
+                      .usingJobData("principal", principal)
+                      .build();
 
       Map<String, Object> info = note.getInfo();
       info.put("cron", null);
@@ -432,9 +455,9 @@ public class Notebook {
       CronTrigger trigger = null;
       try {
         trigger =
-            TriggerBuilder.newTrigger().withIdentity("trigger_" + id, "note")
-            .withSchedule(CronScheduleBuilder.cronSchedule(cronExpr)).forJob(id, "note")
-            .build();
+                TriggerBuilder.newTrigger().withIdentity("trigger_" + id, "note")
+                        .withSchedule(CronScheduleBuilder.cronSchedule(cronExpr)).forJob(id, "note")
+                        .build();
       } catch (Exception e) {
         logger.error("Error", e);
         info.put("cron", e.getMessage());
@@ -469,6 +492,38 @@ public class Notebook {
   }
 
   /**
+   * Get all shared notes.
+   * @return
+   */
+  public List<Note> getAllSharedNotes(){
+    List<Note> noteList = new ArrayList<>();
+    for (Note note : this.getAllNotes()){
+      if (note.getIsShared()) {
+        noteList.add(note);
+      } else {
+        continue;
+      }
+    }
+    return noteList;
+  }
+
+  /**
+   * Get all the shared notes of which a user is owner.
+   * @param principal
+   * @return
+   */
+  public List<Note> getAllSharedNotes(String principal){
+    List<Note> noteList = new ArrayList<>();
+    for (Note note: this.getAllSharedNotes()){
+      if (note.getOwners().contains(principal)){
+        noteList.add(note);
+      } else {
+        continue;
+      }
+    }
+    return noteList;
+  }
+  /**
    *
    * @param id
    * @param principal
@@ -476,12 +531,8 @@ public class Notebook {
    * @return
    */
   public boolean shareNote(String id, String principal, String newPrincipal){
-    boolean isShared = false;
-    try {
-      isShared = notebookRepo.share(id, principal, newPrincipal);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return isShared;
+   Note note = getUserNotes(principal).get(id);
+   note.getOwners().add(newPrincipal);
+   return note.getIsShared();
   }
 }
