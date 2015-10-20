@@ -32,4 +32,6 @@ public interface NotebookRepo {
   public Note get(String noteId, String owner) throws IOException;
   public void save(Note note) throws IOException;
   public void remove(String noteId, String owner) throws IOException;
+  boolean share(String noteId, String owner, String newOwner) throws IOException;
+  public List<NoteInfo> listShared(String owner) throws IOException;
 }
