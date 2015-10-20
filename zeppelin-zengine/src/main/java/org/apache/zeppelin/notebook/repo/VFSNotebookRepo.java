@@ -332,9 +332,8 @@ public class VFSNotebookRepo implements NotebookRepo {
 
   @Override
   public boolean share(String noteId, String owner, String newOwner) throws IOException {
-    FileObject rootDir = fsManager.resolveFile(getPath("/users/" + newOwner));
+    FileObject rootDir = fsManager.resolveFile(getPath("/users/" + owner));
     FileObject noteDir = rootDir.resolveFile(noteId, NameScope.CHILD);
-    boolean isAdded = getNote(noteDir).getOwners().add(newOwner);
-    return isAdded;
+    return getNote(noteDir).getOwners().add(newOwner);
   }
 }
