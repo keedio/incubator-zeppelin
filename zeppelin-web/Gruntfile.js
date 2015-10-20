@@ -148,29 +148,7 @@ module.exports = function (grunt) {
         }
       }
     },
-
-    // Make sure code styles are up to par and there are no obvious mistakes
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc',
-        reporter: require('jshint-stylish')
-      },
-      all: {
-        src: [
-          'Gruntfile.js',
-          '<%= yeoman.app %>/app/**/*.js',
-          '<%= yeoman.app %>/components/**/*.js'
-        ]
-      },
-      test: {
-        options: {
-          jshintrc: 'test/.jshintrc'
-        },
-        src: ['test/spec/{,*/}*.js']
-      }
-    },
-
-    // Empties folders to start fresh
+/**/
     clean: {
       dist: {
         files: [{
@@ -462,12 +440,12 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
+//    'newer:jshint',
     /*
      * Since we dont have test (or up to date) there is no reason to keep this task
      * I am commented this, but can be changed in the future (if someone want to implement front tests).
     'test',
     */
-    'build'
+//    'build'
   ]);
 };

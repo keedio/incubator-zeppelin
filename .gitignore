@@ -24,9 +24,11 @@ zeppelin-web/dist
 zeppelin-web/.tmp
 zeppelin-web/.sass-cache
 zeppelin-web/bower_components
+zeppelin-web/metastore_db
 **nbproject/
 **node/
 zeppelin-web/reports/coverage
+index-*.html
 
 
 # project level

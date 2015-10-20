@@ -37,43 +37,40 @@ limitations under the License.
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/nvd3/src/nv.d3.css" />
+    <link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css" />
     <link rel="stylesheet" href="bower_components/perfect-scrollbar/src/perfect-scrollbar.css" />
     <link rel="stylesheet" href="bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="bower_components/angular-xeditable/dist/css/xeditable.css" />
     <link rel="stylesheet" href="bower_components/highlightjs/styles/github.css" />
-    <link rel="stylesheet" href="bower_components/ngtoast/dist/ngToast.css" />
+    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="bower_components/c3/c3.css" />
+    <link rel="stylesheet" href="bower_components/pivottable/dist/pivot.css" />
     <!-- endbower -->
     <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/all.css" />
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="app/home/home.css">
     <link rel="stylesheet" href="app/notebook/notebook.css">
-    <link rel="stylesheet" href="app/notebook/paragraph/paragraph.css">
     <link rel="stylesheet" href="app/interpreter/interpreter.css">
     <link rel="stylesheet" href="fonts/font-awesome.min.css">
     <link rel="stylesheet" href="fonts/simple-line-icons.css">
     <link rel="stylesheet" href="fonts/custom-font.css">
     <!-- endbuild -->
     <link rel="stylesheet" ng-href="assets/styles/looknfeel/{{looknfeel}}.css">
-    <link rel="stylesheet" ng-href="assets/styles/looknfeel/{{newCSS}}.css">
     <link rel="stylesheet" href="assets/styles/fontImport.css" />
   </head>
   <body ng-class="{'bodyAsIframe': asIframe}" >
     <!--[if lt IE 7]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
-    <toast></toast>
     <div ng-include src="'components/navbar/navbar.html'"></div>
     <!-- Add your site or application content here -->
-    <div id="main" class="container">      
+    <div id="main" class="container">
       <div ng-view></div>
     </div>
     <!-- Modal ::  Keyboard shortcuts -->
     <div ng-include src="'components/modal-shortcut/modal-shortcut.html'"></div>
-    <div ng-controller="NotenameCtrl as notenamectrl">
-   		 <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
-    </div>
+    <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -105,7 +102,7 @@ limitations under the License.
     <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
     <script src="bower_components/jquery.scrollTo/jquery.scrollTo.js"></script>
     <script src="bower_components/d3/d3.js"></script>
-    <script src="bower_components/nvd3/nv.d3.js"></script>
+    <script src="bower_components/nvd3/build/nv.d3.js"></script>
     <script src="bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
     <script src="bower_components/perfect-scrollbar/src/perfect-scrollbar.js"></script>
@@ -116,8 +113,22 @@ limitations under the License.
     <script src="bower_components/highlightjs/highlight.pack.js"></script>
     <script src="bower_components/lodash/lodash.js"></script>
     <script src="bower_components/angular-filter/dist/angular-filter.min.js"></script>
-    <script src="bower_components/ngtoast/dist/ngToast.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/topojson/topojson.js"></script>
+    <script src="bower_components/keedio-datamps/dist/datamaps.all.js"></script>
+    <script src="bower_components/datamaps/dist/datamaps.all.js"></script>
+    <script src="bower_components/angular-datamaps/dist/angular-datamaps.min.js"></script>
+    <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
+    <script src="bower_components/Leaflet.MakiMarkers/Leaflet.MakiMarkers.js"></script>
+    <script src="bower_components/c3/c3.js"></script>
+    <script src="bower_components/jqueryui/jquery-ui.js"></script>
+    <script src="bower_components/pivottable/dist/pivot.js"></script>
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <script src="bower_components/highcharts/highcharts.js"></script>
+    <script src="bower_components/highcharts/highcharts-more.js"></script>
+    <script src="bower_components/highcharts/modules/exporting.js"></script>
     <!-- endbower -->
+
     <!-- endbuild -->
     <!-- build:js({.tmp,src}) scripts/scripts.js -->
     <script src="app/app.js"></script>
@@ -126,7 +137,15 @@ limitations under the License.
     <script src="app/notebook/notebook.controller.js"></script>
     <script src="app/interpreter/interpreter.controller.js"></script>
     <script src="app/notebook/paragraph/paragraph.controller.js"></script>
-    <script src="components/arrayOrderingSrv/arrayOrdering.service.js"></script>
+    <script src="app/components/main.module.js"></script>    
+    <script src="app/components/datamap/main.datamap.module.js"></script>
+    <script src="app/components/datamap/DatamapService.js"></script>
+    <script src="app/components/leaflet/main.leaflet.module.js"></script>
+    <script src="app/components/leaflet/LeafletService.js"></script>    
+    <script src="app/components/utility/main.utility.module.js"></script>
+    <script src="app/components/utility/PivotService.js"></script>
+    <script src="app/components/multiple/main.multiple.module.js"></script>
+    <script src="app/components/multiple/MultipleService.js"></script>    
     <script src="components/navbar/navbar.controller.js"></script>
     <script src="components/ngescape/ngescape.directive.js"></script>
     <script src="components/noteName-create/notename.controller.js"></script>
@@ -138,7 +157,12 @@ limitations under the License.
     <script src="components/websocketEvents/websocketMsg.service.js"></script>
     <script src="components/websocketEvents/websocketEvents.factory.js"></script>
     <script src="components/notebookListDataFactory/notebookList.datafactory.js"></script>
-    <script src="components/baseUrl/baseUrl.service.js"></script>
+    <script src="components/baseUrl/baseUrl.service.js"></script>  
     <!-- endbuild -->
+    <!-- build:js assets/javascript/vendor/gchart.js -->
+    <script src="assets/javascript/vendor/gchart_renderers.js"></script>
+    <script src="assets/javascript/vendor/jsapi.js"></script>  
+    <!-- endbuild -->
+    <script type="text/javascript" src="bower_components/jqwidgets/jqwidgets/jqx-all.js"></script>
   </body>
 </html>

@@ -42,7 +42,7 @@ module.exports = function(config) {
       'bower_components/angular-ui-ace/ui-ace.js',
       'bower_components/jquery.scrollTo/jquery.scrollTo.js',
       'bower_components/d3/d3.js',
-      'bower_components/nvd3/nv.d3.js',
+      'bower_components/nvd3/build/nv.d3.js',
       'bower_components/jquery-ui/jquery-ui.js',
       'bower_components/angular-dragdrop/src/angular-dragdrop.js',
       'bower_components/perfect-scrollbar/src/perfect-scrollbar.js',
@@ -53,13 +53,25 @@ module.exports = function(config) {
       'bower_components/highlightjs/highlight.pack.js',
       'bower_components/lodash/lodash.js',
       'bower_components/angular-filter/dist/angular-filter.min.js',
-      'bower_components/ngtoast/dist/ngToast.js',
+      'bower_components/underscore/underscore.js',
+      'bower_components/topojson/topojson.js',
+      'bower_components/keedio-datamps/dist/datamaps.all.js',
+      'bower_components/datamaps/dist/datamaps.all.js',
+      'bower_components/angular-datamaps/dist/angular-datamaps.min.js',
+      'bower_components/leaflet/dist/leaflet-src.js',
+      'bower_components/Leaflet.MakiMarkers/Leaflet.MakiMarkers.js',
+      'bower_components/c3/c3.js',
+      'bower_components/jqueryui/jquery-ui.js',
+      'bower_components/pivottable/dist/pivot.js',
+      'bower_components/webcomponentsjs/webcomponents.js',
+      'bower_components/highcharts/highcharts.js',
+      'bower_components/highcharts/highcharts-more.js',
+      'bower_components/highcharts/modules/exporting.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/app/app.js',
       'src/app/app.controller.js',
       'src/app/**/*.js',
-      'src/components/**/*.js',
       'test/spec/**/*.js'
     ],
 
@@ -67,7 +79,7 @@ module.exports = function(config) {
     exclude: [],
 
     // web server port
-    port: 9002,
+    port: 8080,
 
     // Start these browsers, currently available:
     // - Chrome
@@ -81,22 +93,10 @@ module.exports = function(config) {
       'PhantomJS'
     ],
 
-    reporters: 'coverage',
-
-    preprocessors: {
-      'src/*/{*.js,!(test)/**/*.js}': 'coverage'
-    },
-
-    coverageReporter: {
-      type: 'html',
-      dir: 'reports/coverage'
-    },
-
     // Which plugins to enable
     plugins: [
       'karma-phantomjs-launcher',
-      'karma-jasmine',
-      'karma-coverage'
+      'karma-jasmine'
     ],
 
     // Continuous Integration mode

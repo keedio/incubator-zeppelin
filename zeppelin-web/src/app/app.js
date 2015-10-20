@@ -31,7 +31,8 @@ angular.module('zeppelinWebApp', [
     'monospaced.elastic',
     'puElasticInput',
     'xeditable',
-    'ngToast'
+    'datamaps',
+    'app.module'
   ])
   .filter('breakFilter', function() {
     return function (text) {
@@ -40,10 +41,11 @@ angular.module('zeppelinWebApp', [
       }
     };
   })
-  .config(function ($routeProvider, ngToastProvider) {
+  .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
-        templateUrl: 'app/home/home.html'
+        templateUrl: 'app/home/home.html',
+        controller: 'HomeCtrl'
       })
       .when('/notebook/:noteId', {
         templateUrl: 'app/notebook/notebook.html',
@@ -60,10 +62,7 @@ angular.module('zeppelinWebApp', [
       .otherwise({
         redirectTo: '/'
       });
-  
-    ngToastProvider.configure({
-      dismissButton: true,
-      dismissOnClick: false,
-      timeout: 6000
-    });
-  });
+  })
+  .factory('_', ['$window', function($window) {
+    return $window._; // assumes underscore has already been loaded on the page
+  }]);

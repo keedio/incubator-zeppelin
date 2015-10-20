@@ -1,0 +1,45 @@
+        <div class="row">
+          <div class="col-md-2">
+            <span class="columns lightBold">
+              X Serie
+              <ul data-drop="true"
+                  ng-model="paragraph.config.graph.xserie"
+                  jqyoui-droppable="{multiple:false, onDrop:'onGraphOptionChange()'}"
+                  class="list-unstyled">
+                <li ng-repeat="item in paragraph.config.graph.xserie">
+                  <button class="btn btn-primary btn-xs">
+                    {{item.name}} <span class="fa fa-close" ng-click="removeGraphOptionXSerie($index)"></span>
+                  </button>
+                </li>
+              </ul>
+            </span>
+          </div>
+          <div class="col-md-2">
+            <span class="columns lightBold">
+              Y Series
+              <ul data-drop="true"
+                  ng-model="paragraph.config.graph.yseries"
+                  jqyoui-droppable="{multiple:true, onDrop:'onGraphOptionChange()'}"
+                  class="list-unstyled">
+                <li ng-repeat="item in paragraph.config.graph.yseries">
+                  <div class="btn-group">
+                    <div class="btn btn-info btn-xs dropdown-toggle"
+                         type="button"
+                         data-toggle="dropdown">
+                      {{item.name | limitTo: 30}}{{item.name.length > 30 ? '...' : ''}}
+                      <font style="color:#EEEEEE;"><span class="lightBold" style="text-transform: uppercase;">{{item.type}}</span></font>
+                      <span class="fa fa-close" ng-click="removeGraphOptionYSerie($index)"></span>
+                    </div>
+                    <ul class="dropdown-menu" role="menu">
+                      <li ng-click="setGraphOptionValueType($index, 'line')"><a>Line Chart</a></li>
+                      <li ng-click="setGraphOptionValueType($index, 'area')"><a>Area Chart</a></li>
+                      <li ng-click="setGraphOptionValueType($index, 'bar')"><a>Bar Chart</a></li>
+                      <li ng-click="setGraphOptionValueType($index, 'spline')"><a>Spline Chart</a></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </span>
+          </div>
+        </div>
+
