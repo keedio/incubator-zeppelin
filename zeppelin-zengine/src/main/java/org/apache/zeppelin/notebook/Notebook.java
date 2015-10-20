@@ -51,7 +51,7 @@ public class Notebook {
   private SchedulerFactory schedulerFactory;
   private InterpreterFactory replFactory;
   /** Keep the order. */
-  Map<String, Map<String, Note>> notes = new LinkedHashMap<String, Map<String, Note>>();
+  Map<String, Map<String, Note>> notes = new LinkedHashMap<>();
   private ZeppelinConfiguration conf;
   private StdSchedulerFactory quertzSchedFact;
   private org.quartz.Scheduler quartzSched;
@@ -341,6 +341,41 @@ public class Notebook {
     }
   }
 
+  /**
+   * Get all shared notes. All those notes which owners's list is
+   * greater than one, because all notes have a default owner (aka
+   * principal or notes's creator).
+   * @return
+   */
+  public List<Note> getAllSharedNotes(){
+    List<Note> noteList = new ArrayList<>();
+    for (Note note : this.getAllNotes()){
+      if (note.getOwners().size() > 1) {
+        noteList.add(note);
+      } else {
+        continue;
+      }
+    }
+    return noteList;
+  }
+
+  /**
+   * Get all the shared notes a user is owner.
+   * @param principal
+   * @return
+   */
+  public List<Note> getAllSharedNotes(String principal){
+    List<Note> noteList = new ArrayList<>();
+    for (Note note: this.getAllSharedNotes()){
+      if (note.getOwners().contains(principal)){
+        noteList.add(note);
+      } else {
+        continue;
+      }
+    }
+    return noteList;
+  }
+
   public JobListenerFactory getJobListenerFactory() {
     return jobListenerFactory;
   }
@@ -435,4 +470,13 @@ public class Notebook {
     return conf;
   }
 
+  public boolean shareNote(String id, String principal, String newPrincipal){
+    boolean isShared = false;
+    try {
+      isShared = notebookRepo.share(id, principal, newPrincipal);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return isShared;
+  }
 }
