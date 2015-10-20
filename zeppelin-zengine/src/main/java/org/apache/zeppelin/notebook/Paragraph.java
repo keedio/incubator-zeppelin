@@ -235,7 +235,7 @@ public class Paragraph extends Job implements Serializable, Cloneable {
       }
 
     }
-    logger().info("RUN : " + script);
+    logger().debug("RUN : " + script);
     InterpreterResult ret = repl.interpret(script, getInterpreterContext());
     return ret;
   }
@@ -323,7 +323,7 @@ public class Paragraph extends Job implements Serializable, Cloneable {
     setResult(value);
     setException(t);
   }
-  
+
   @Override
   public Object clone() throws CloneNotSupportedException {
     Paragraph paraClone = (Paragraph) super.clone();
