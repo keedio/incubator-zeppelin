@@ -45,7 +45,9 @@ public class Note implements Serializable, JobListener {
   private String name;
   private String id;
   private String owner;
+  private String newOwner;
   private List<String> owners = new ArrayList<>();
+  private Boolean isShared;
   Map<String, List<AngularObject>> angularObjects = new HashMap<String, List<AngularObject>>();
 
   private transient NoteInterpreterLoader replLoader;
@@ -333,6 +335,16 @@ public class Note implements Serializable, JobListener {
     repo.remove(id(), this.owner);
   }
 
+  /**
+   * Share note.
+   * @return
+   * @throws IOException
+   */
+  public boolean share() throws IOException{
+    setIsShared(repo.share(getId(), this.owner, newOwner));
+    return getIsShared();
+  }
+
   public Map<String, Object> getConfig() {
     if (config == null) {
       config = new HashMap<String, Object>();
@@ -372,5 +384,14 @@ public class Note implements Serializable, JobListener {
 
   @Override
   public void onProgressUpdate(Job job, int progress) {}
+
+
+  public Boolean getIsShared() {
+    return isShared;
+  }
+
+  public void setIsShared(Boolean isShared) {
+    this.isShared = isShared;
+  }
 
 }
