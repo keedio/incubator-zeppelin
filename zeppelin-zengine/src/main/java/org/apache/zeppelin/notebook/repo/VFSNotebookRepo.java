@@ -136,6 +136,45 @@ public class VFSNotebookRepo implements NotebookRepo {
     return infos;
   }
 
+  /**
+   * Get list of noteInfo owned by owner and shared whith owner.
+   * @param owner
+   * @return
+   * @throws IOException
+   */
+  @Override
+  public List<NoteInfo> listShared(String owner) throws IOException{
+    List<NoteInfo> infos = new LinkedList<>();
+    FileObject rootDir = fsManager.resolveFile(getRootDir(), "users");
+    if (!rootDir.exists())
+      rootDir.createFolder();
+    logger.info(rootDir.getName().getPath());
+
+    FileObject[] users = rootDir.getChildren();
+    for (FileObject user : users) {
+      if (!isDirectory(user)) {
+        // currently one directory per user saved like, users/[OWNER]/[NOTE_ID]/note.json.
+        // so it must be a directory
+        continue;
+      }
+      FileObject[] notes = user.getChildren();
+      for (FileObject note : notes) {
+        NoteInfo info = null;
+        try {
+          info = getNoteInfo(note);
+          if (info != null && info.getOwners().contains(owner)) {
+            infos.add(info);
+          } else {
+            continue;
+          }
+        } catch (IOException e) {
+          logger.error("Can't read note " + note.getName().toString(), e);
+        }
+      } //end of notes
+    } //end of users
+    return infos;
+  }
+
   @Override
   public List<NoteInfo> list() throws IOException {
     FileObject rootDir = fsManager.resolveFile(getRootDir(), "users");
@@ -164,7 +203,8 @@ public class VFSNotebookRepo implements NotebookRepo {
       }
 
       try {
-        List<NoteInfo> ownerInfos = list(owner);
+        //List<NoteInfo> ownerInfos = list(owner);
+        List<NoteInfo> ownerInfos = listShared(owner);
         if (ownerInfos != null) {
           infos.addAll(ownerInfos);
         }
@@ -288,5 +328,13 @@ public class VFSNotebookRepo implements NotebookRepo {
     }
 
     noteDir.delete(Selectors.SELECT_SELF_AND_CHILDREN);
+  }
+
+  @Override
+  public boolean share(String noteId, String owner, String newOwner) throws IOException {
+    FileObject rootDir = fsManager.resolveFile(getPath("/users/" + newOwner));
+    FileObject noteDir = rootDir.resolveFile(noteId, NameScope.CHILD);
+    boolean isAdded = getNote(noteDir).getOwners().add(newOwner);
+    return isAdded;
   }
 }
