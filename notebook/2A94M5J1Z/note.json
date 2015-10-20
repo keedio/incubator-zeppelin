@@ -73,13 +73,13 @@
     },
     {
       "text": "%sql \nselect age, count(1) value\nfrom bank \nwhere age \u003c 30 \ngroup by age \norder by age",
-      "dateUpdated": "Oct 8, 2015 3:31:36 PM",
+      "dateUpdated": "Oct 16, 2015 1:56:02 PM",
       "config": {
         "colWidth": 4.0,
         "graph": {
           "mode": "multiBarChart",
           "height": 1272.0,
-          "optionOpen": false,
+          "optionOpen": true,
           "keys": [
             {
               "name": "age",
@@ -87,13 +87,7 @@
               "aggr": "sum"
             }
           ],
-          "values": [
-            {
-              "name": "value",
-              "index": 1.0,
-              "aggr": "sum"
-            }
-          ],
+          "values": [],
           "groups": [],
           "scatter": {
             "xAxis": {
@@ -449,18 +443,18 @@
   "name": "Zeppelin Tutorial",
   "id": "2A94M5J1Z",
   "angularObjects": {
-    "2AZ2C7VMV": [],
-    "2B3AWN8KY": [],
-    "2B1XRSPTA": [],
-    "2AZAC7QGT": [],
-    "2B2P9HMXF": [],
-    "2AYEPE7JR": [],
-    "2AZCDGZWA": [],
-    "2B24NUUWC": [],
-    "2AZC5M28J": [],
-    "2B2B9RA32": [],
-    "2B2WXBBC1": [],
-    "2AYPKZUZF": []
+    "2B381ZYW1": [],
+    "2B4RPJPK9": [],
+    "2B4E47NXS": [],
+    "2B1PK25DQ": [],
+    "2B4B86ZVS": [],
+    "2B47M8FJ6": [],
+    "2AZUC7RSG": [],
+    "2B32UWG1U": [],
+    "2B4HU6XGC": [],
+    "2B296H3A4": [],
+    "2AZXSQ9F9": [],
+    "2B347YW8N": []
   },
   "config": {
     "looknfeel": "default"

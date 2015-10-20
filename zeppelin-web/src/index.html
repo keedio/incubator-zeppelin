@@ -36,7 +36,6 @@ limitations under the License.
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css" />
     <link rel="stylesheet" href="bower_components/perfect-scrollbar/src/perfect-scrollbar.css" />
@@ -129,6 +128,7 @@ limitations under the License.
     <script src="bower_components/highcharts/highcharts-more.js"></script>
     <script src="bower_components/highcharts/modules/exporting.js"></script>
     <!-- endbower -->
+
     <!-- endbuild -->
     <!-- build:js({.tmp,src}) scripts/scripts.js -->
     <script src="app/app.js"></script>
@@ -157,12 +157,12 @@ limitations under the License.
     <script src="components/websocketEvents/websocketMsg.service.js"></script>
     <script src="components/websocketEvents/websocketEvents.factory.js"></script>
     <script src="components/notebookListDataFactory/notebookList.datafactory.js"></script>
-    <script src="components/baseUrl/baseUrl.service.js"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi?autoload= 
-{'modules':[{'name':'visualization','version':'1.1','packages':
-['corechart']}]}"></script>
-    <script src="bower_components/pivottable/dist/gchart_renderers.js"></script>
-
+    <script src="components/baseUrl/baseUrl.service.js"></script>  
     <!-- endbuild -->
+    <!-- build:js assets/javascript/vendor/gchart.js -->
+    <script src="assets/javascript/vendor/gchart_renderers.js"></script>
+    <script src="assets/javascript/vendor/jsapi.js"></script>  
+    <!-- endbuild -->
+    <script type="text/javascript" src="bower_components/jqwidgets/jqwidgets/jqx-all.js"></script>
   </body>
 </html>
