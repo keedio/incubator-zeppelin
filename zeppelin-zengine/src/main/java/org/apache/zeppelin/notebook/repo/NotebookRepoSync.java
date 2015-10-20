@@ -303,13 +303,13 @@ public class NotebookRepoSync implements NotebookRepo{
   }
 
   @Override
-  //TODO(Luis Lázaro): share a note in this repo
+  //TODO(Luis Lázaro): Does it make sense sharing notes on NotebookReposync?
   public boolean share(String noteId, String owner, String newOwner) throws IOException {
     return false;
   }
 
   @Override
-  //TODO(Luis Lázaro): get list of shared notes with owner
+  //TODO(Luis Lázaro): Does it make sense list shared notes on NotebookReposync?
   public List<NoteInfo> listShared(String owner) throws IOException {
     return new ArrayList<>();
   }
