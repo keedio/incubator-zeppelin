@@ -22,7 +22,8 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
   // create the list of themes  
   $rootScope.newStyles = [  
     { name: 'default', url: 'default' },  
-    { name: 'keedio', url: 'keedio' }    
+    { name: 'keedio', url: 'keedio' },
+    { name: 'produban', url: 'produban' }    
   ];
 
   var init = function() {

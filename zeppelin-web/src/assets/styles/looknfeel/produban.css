@@ -18,50 +18,38 @@
  * ***************************************************************************/
 
 body {
-  /*background: #ecf0f1;*/
-  font-family: Dsignes Light;
-  color: #666484;
-  font-weight: bold;
+  /*background: #ecf0f1;*/  
+  color: #88182A;
   background: none;   
 }
 
-.dropdown-toggle, textarea, 
-.dropdown, input[type="text"] {
-  font-family: Dsignes Light;
-  font-style: bold;
-  color: #434142;
-}
-
 a {
-  color: #87BAAC;
+  color: #C02844;
 }
 
 a:hover {
-  color: #55A08E;    
+  color: #88182A;    
 }
 
-h4 {
-  font-family: Dsignes Bold;
+h4 {  
   font-size: 20px;
-  color: #666484;
+  color: #CD6A00;
 }
 
-h5 {
-  font-family: Dsignes Bold;
+h5 {  
   font-size: 14px;
-  color: #666484;
+  color: #CD6A00;
 }
 
 .table-striped > tbody > tr:nth-child(odd) > th {
   border-color: none;
-  background-color: #9A999D;
-  font-family: Dsignes Bold;  
-  color:#352B5B;
+  background-color: #93421C;
+  color:#FFFFFF;
 }
 
 .table-striped > tbody > tr:nth-child(odd) > td {
   border-color: none;
-  background-color: #C2C3C8;
+  background-color: #CD6A00;
 }
 
 .table-striped > tbody > tr:nth-child(even) > td,
@@ -70,35 +58,35 @@ h5 {
 }
 
 .btn-primary {
-    background: #352B5B;
+    background: #C02844;
     color: #FFFFFF;
     border-color: none;
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-    background: #666484;
+    background: #88182A;
     border-color: none;
 }
 .btn-primary:active, .btn-primary.active {
-    background: #352B5B;
+    background: #C02844;
     box-shadow: none;
     border-color: none;
 }
 .btn-success {
-    background: #87BAAC;
+    background: #99C2A8;
     color: #FFFFFF;
     border-color: none;
 }
 .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .open > .dropdown-toggle.btn-success {
-    background: #55A08E;
+    background: #0F7344;
     border-color: none;
 }
 .btn-success:active, .btn-success.active {
-    background: #599386;
+    background: #99C2A8;
     box-shadow: none;
     border-color: none;
 }
 .btn-info {
-    background: #666484;
+    background: #CD6A00;
     color: #FFFFFF;
     border-color: none;
 }
@@ -106,13 +94,13 @@ h5 {
     background: #352B5B;
 }
 .btn-info:active, .btn-info.active {
-    background: #666484;
+    background: #CD6A00;
     box-shadow: none;
     border-color: none;
 }
 
 .btn-default {
-  background: #87BAAC;
+  background: #99C2A8;
   color: #FFFFFF;
   border-color: none;
   border-style: solid;
@@ -120,13 +108,15 @@ h5 {
 
 .btn-default:hover, .btn-default:focus, .btn-default:active, 
 .btn-default.active, .open > .dropdown-toggle.btn-default {
-  background: #55A08E;
+  background: #0F7344;
+  color: #FFFFFF;
   border-color: none;
   border-style: solid;
 }
 
 .btn-default:active, .btn-default.active {
-  background: #599386;
+  background: #054529;
+  color: #FFFFFF;
   box-shadow: none;
   border-color: none;
   border-style: solid;
@@ -137,39 +127,39 @@ h5 {
  * ***************************************************************************/
 body .navbar {
   margin-bottom: 10px;
-  font-family: Dsignes Bold;
-  background-color: #352B5B;
+  background-color: #58212A;
 }
 
 .navbar-title span {
   display: none;
 }
+
+/*
 .navbar-title:after {
-  content: 'Kata';
+  content: 'Produban';
+  margin-top: -7px;
 }
+*/
 
 .navbar-fixed-top .container .navbar-header .navbar-brand img {
-  content: url('/assets/images/keedio/logo-white.png');
-}
-
-.navbar-fixed-top .container .navbar-collapse ul > li > a {
-  font-family: Dsignes Bold;  
+  content: url('/assets/images/produban/produban.png');
+  margin-top: -7px;
 }
 
 .navbar-inverse {
-  background-color: #666484;
+  background-color: #CD6A00;
   color: #FFFFFF;
-  border-color: #666484;
+  border-color: #CD6A00;
   font-size: 18px;
 }
 
 .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
   color: #FFFFFF;
-  background-color: #666484;
+  background-color: #CD6A00;
 }
 
 .navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
-  background-color: #666484;
+  background-color: #CD6A00;
 }
 
 .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
@@ -184,7 +174,7 @@ body .navbar {
 
 .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
   color: #fff;
-  background-color: #666484;
+  background-color: #CD6A00;
 }
 
 .navbar-inverse .navbar-nav > li > a {
@@ -195,16 +185,13 @@ body .navbar {
   color: #fff;
   text-decoration: none;
   font-size: 32px;
-  margin-top: -7px;
+  margin-top: -13px;
 }
 
 a.navbar-brand:hover {
   color: #fff !important;
 }
 
-.server-connected {
-  color: #55A08E;
-}
 
 /* ****************************************************************************
  * Home.
@@ -215,8 +202,7 @@ a.navbar-brand:hover {
 }
 
 .box-heading{
-  font-family: Dsignes Bold;
-  color: #666484;
+  color: #C02844;
   position:relative;
   max-width: 100%;
   /*font-size: 20px;*/
@@ -230,7 +216,7 @@ a.navbar-brand:hover {
 }
 
 .zeppelin {
-  background-image: url('/assets/images/keedio/logo-purple-big.png');
+  background-image: url('/assets/images/produban/produban-logo.png');
   background-repeat: no-repeat;
   background-position: right;
   height: 410px;
@@ -249,28 +235,24 @@ a.navbar-brand:hover {
 .new_h3 {
   margin-top: 1px;
   padding-top: 7px;
-  font-family: Dsignes Bold;
-  color: #666484;
+  color: #88182A;
 }
 
 .row {
   margin-right: 0px !important;
-  font-family: Dsignes Light;
   font-weight: bold;
-  color: #666484;
+  color: #93421C;
 }
 
 .interpreter .interpreter-title {
-  font-size:20px;  
-  font-family: Dsignes Bold;
-  color: #55A08E;
+  font-size:20px; 
+  color: #5D2819;
   float:left;
   margin-top:0px;
 }
 
 .interpreter .interpreter-title span {
-  font-family: Dsignes Bold;
-  color: #87BAAC;  
+  color: #93421C;  
 }
 
 
@@ -283,104 +265,27 @@ a.navbar-brand:hover {
   border-radius: 12px;
 }
 
-.table-condensed > thead > tr > th {
-  color: #666484;
-  font-family: Dsignes Bold;
-  background-color: #C2C3C8;
-}
-
-.table-condensed > tr {
-  color: #666484;
-  font-family: Dsignes Light;
-}
-
-.table-condensed > tr:hover {
-  background-color: #C2C3C8;
-}
-
-.paragraph .control {
-  background-color: rgba(255,255,255,0.85);
-  /*display: none;*/
-  float: right;
-  font-family: Dsignes Bold;
-  color: #666484;
-  margin-top: 1px;
-  margin-right: 5px;
-  position:absolute;
-  clear:both;
-  right:15px;
-  top: 16px;
-  text-align:right;
-  font-size:12px;
-  border: none;
-  border-radius: 12px;
-}
-
-.paragraph .control li{
-  font-size:12px;
-  margin-bottom:4px;
-  font-family: Dsignes Bold;
-  color: #352B5B;
-}
-
-.paragraph .runControl {
-  font-size: 1px;
-  color: #9A999D;
-  height:4px;
-  margin: 1px 0px 0px 0px;
-}
-
-.paragraph .runControl .progress {
-  position: relative;
-  width:100%;
-  height:4px;
-  z-index:100;
-  border-radius: 0px;
-}
-
-.paragraph .runControl .progress .progress-bar {
-  z-index:100;
-  background-color: #55A08E;
-}
-
-.paragraph .executionTime {
-  color: #352B5B;
-  font-size: 10px;
-  font-family: Dsignes Bold;
-}
-
-.btnText {
-  font-family: Dsignes Bold;
-  color: #666484;
-}
-
 /* ****************************************************************************
  * Modal Window.
  * ***************************************************************************/
 
 .modal-content {
-  background: url('/assets/images/keedio/fondo_identidad.png') no-repeat center center fixed; 
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;  
+  background-color: #EDEDED;
 }
 
 .keys {
   padding-right: 10px;
-  color: #434142;
+  color: #054529;
   text-align: right;
   white-space: nowrap;
-  font-family: Dsignes Light;
   font-weight: bold;
 }
 
 .kbd-dark {
   color: #FFFFFF;
-  background-color: #55A08E;
+  background-color: #99C2A8;
   background-image: none;
   border: 0;
-  font-family: Dsignes Light;
   font-weight: bold;
 }
 
@@ -391,7 +296,7 @@ kbd {
   background-repeat: repeat-x;
   display: inline-block;
   padding: 4px 5px;
-  font-family: 11px Dsignes Light;
+  font: 11px Dsignes Light;
   font-weight: bold;
   line-height: 10px;
   color: #000;
