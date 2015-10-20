@@ -158,6 +158,9 @@ public class NotebookServer extends WebSocketServlet implements
           case ANGULAR_OBJECT_UPDATED:
             angularObjectUpdated(conn, notebook, messagereceived);
             break;
+          case SHARE_NOTE:
+            shareNote(conn, notebook, messagereceived);
+            break;
           default:
             broadcastNoteList(conn, messagereceived);
             break;
@@ -436,6 +439,24 @@ public class NotebookServer extends WebSocketServlet implements
     notebook.removeNote(noteId, fromMessage.principal);
     removeNote(noteId);
     broadcastNoteList(conn, fromMessage);
+  }
+
+  /**
+   *
+   * @param conn
+   * @param notebook
+   * @param fromMessage
+   * @return
+   * @throws IOException
+   */
+  private boolean shareNote(NotebookSocket conn, Notebook notebook, Message fromMessage)
+      throws IOException {
+    String noteId = (String) fromMessage.get("id");
+    if (noteId == null) {
+      return false;
+    }
+    broadcastNoteList(conn, fromMessage);
+    return notebook.shareNote(noteId, fromMessage.principal, fromMessage.newPrincipal);
   }
 
   private void updateParagraph(NotebookSocket conn, Notebook notebook,
