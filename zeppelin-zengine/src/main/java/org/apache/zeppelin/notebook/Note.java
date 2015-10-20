@@ -45,7 +45,6 @@ public class Note implements Serializable, JobListener {
   private String name;
   private String id;
   private String owner;
-  private String newOwner;
   private List<String> owners = new ArrayList<>();
   private Boolean isShared;
   Map<String, List<AngularObject>> angularObjects = new HashMap<String, List<AngularObject>>();
@@ -56,29 +55,31 @@ public class Note implements Serializable, JobListener {
 
   /**
    * note configurations.
-   *
+   * <p/>
    * - looknfeel - cron
    */
   private Map<String, Object> config = new HashMap<String, Object>();
 
   /**
    * note information.
-   *
+   * <p/>
    * - cron : cron expression validity.
    */
   private Map<String, Object> info = new HashMap<String, Object>();
 
 
-  public Note() {}
+  public Note() {
+  }
 
   public Note(NotebookRepo repo,
-      NoteInterpreterLoader replLoader,
-      JobListenerFactory jobListenerFactory, String owner) {
+              NoteInterpreterLoader replLoader,
+              JobListenerFactory jobListenerFactory, String owner) {
     this.repo = repo;
     this.replLoader = replLoader;
     this.jobListenerFactory = jobListenerFactory;
     this.owner = owner;
     owners.add(owner);
+    isShared = false;
     generateId();
   }
 
@@ -89,14 +90,18 @@ public class Note implements Serializable, JobListener {
   public String id() {
     return id;
   }
-  
+
   public String getId() {
     return id;
   }
 
-  public String getOwner() { return this.owner; }
+  public String getOwner() {
+    return this.owner;
+  }
 
-  public String setOwner() { return this.owner; }
+  public String setOwner() {
+    return this.owner;
+  }
 
   public List<String> getOwners() {
     return owners;
@@ -165,7 +170,7 @@ public class Note implements Serializable, JobListener {
       paragraphs.add(p);
     }
   }
-  
+
   /**
    * Insert paragraph in given index.
    *
@@ -203,7 +208,7 @@ public class Note implements Serializable, JobListener {
    * Move paragraph into the new index (order from 0 ~ n-1).
    *
    * @param paragraphId
-   * @param index new index
+   * @param index       new index
    */
   public void moveParagraph(String paragraphId, int index) {
     synchronized (paragraphs) {
@@ -335,16 +340,6 @@ public class Note implements Serializable, JobListener {
     repo.remove(id(), this.owner);
   }
 
-  /**
-   * Share note.
-   * @return
-   * @throws IOException
-   */
-  public boolean share() throws IOException{
-    setIsShared(repo.share(getId(), this.owner, newOwner));
-    return getIsShared();
-  }
-
   public Map<String, Object> getConfig() {
     if (config == null) {
       config = new HashMap<String, Object>();
@@ -383,15 +378,17 @@ public class Note implements Serializable, JobListener {
   }
 
   @Override
-  public void onProgressUpdate(Job job, int progress) {}
+  public void onProgressUpdate(Job job, int progress) {
+  }
 
-
+  /**
+   * getter for boolean isShared
+   * @return
+   */
   public Boolean getIsShared() {
     return isShared;
   }
 
-  public void setIsShared(Boolean isShared) {
-    this.isShared = isShared;
-  }
+
 
 }
