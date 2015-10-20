@@ -301,4 +301,17 @@ public class NotebookRepoSync implements NotebookRepo{
         entry.getValue().toString() + "of class " + entry.getClass());
     }
   }
+
+  @Override
+  //TODO(Luis Lázaro): share a note in this repo
+  public boolean share(String noteId, String owner, String newOwner) throws IOException {
+    return false;
+  }
+
+  @Override
+  //TODO(Luis Lázaro): get list of shared notes with owner
+  public List<NoteInfo> listShared(String owner) throws IOException {
+    return new ArrayList<>();
+  }
+
 }
