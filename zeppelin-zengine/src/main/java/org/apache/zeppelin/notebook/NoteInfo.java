@@ -17,7 +17,9 @@
 
 package org.apache.zeppelin.notebook;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +29,7 @@ public class NoteInfo {
   String id;
   String name;
   String owner;
+  private List<String> owners = new ArrayList<>();
   private Map<String, Object> config = new HashMap<String, Object>();
 
   public NoteInfo(String id, String name, String owner, Map<String, Object> config) {
@@ -42,6 +45,15 @@ public class NoteInfo {
     name = note.getName();
     owner = note.getOwner();
     config = note.getConfig();
+    owners = note.getOwners();
+  }
+
+  public List<String> getOwners() {
+    return owners;
+  }
+
+  public void setOwners(List<String> owners) {
+    this.owners = owners;
   }
 
   public String getId() {
