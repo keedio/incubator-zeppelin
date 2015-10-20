@@ -21,19 +21,18 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.zeppelin.interpreter.InterpreterSetting;
+import org.apache.zeppelin.notebook.Note;
 import org.apache.zeppelin.notebook.Notebook;
 import org.apache.zeppelin.rest.message.InterpreterSettingListForNoteBind;
+import org.apache.zeppelin.rest.message.NewNotebookRequest;
 import org.apache.zeppelin.server.JsonResponse;
+import org.apache.zeppelin.socket.NotebookServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,11 +48,14 @@ public class NotebookRestApi {
   Logger logger = LoggerFactory.getLogger(NotebookRestApi.class);
   Gson gson = new Gson();
   private Notebook notebook;
+  private NotebookServer notebookServer;
 
   public NotebookRestApi() {}
 
-  public NotebookRestApi(Notebook notebook) {
+  public NotebookRestApi(Notebook notebook, NotebookServer notebookServer) {
+
     this.notebook = notebook;
+    this.notebookServer = notebookServer;
   }
 
   /**
@@ -79,17 +81,17 @@ public class NotebookRestApi {
     String principal = getPrincipal();
 
     List<InterpreterSettingListForNoteBind> settingList =
-      new LinkedList<InterpreterSettingListForNoteBind>();
+            new LinkedList<InterpreterSettingListForNoteBind>();
 
     List<InterpreterSetting> selectedSettings =
             notebook.getBindedInterpreterSettings(noteId, principal);
     for (InterpreterSetting setting : selectedSettings) {
       settingList.add(new InterpreterSettingListForNoteBind(
-          setting.id(),
-          setting.getName(),
-          setting.getGroup(),
-          setting.getInterpreterGroup(),
-          true)
+                      setting.id(),
+                      setting.getName(),
+                      setting.getGroup(),
+                      setting.getInterpreterGroup(),
+                      true)
       );
     }
 
@@ -105,11 +107,11 @@ public class NotebookRestApi {
 
       if (!selected) {
         settingList.add(new InterpreterSettingListForNoteBind(
-            setting.id(),
-            setting.getName(),
-            setting.getGroup(),
-            setting.getInterpreterGroup(),
-            false)
+                        setting.id(),
+                        setting.getName(),
+                        setting.getGroup(),
+                        setting.getInterpreterGroup(),
+                        false)
         );
       }
     }
@@ -117,7 +119,85 @@ public class NotebookRestApi {
   }
 
   private String getPrincipal() {
-    return SecurityUtils.getSubject().getPrincipal().toString();
+    Object oprincipal = SecurityUtils.getSubject().getPrincipal();
+    String principal;
+    if (oprincipal == null)
+      principal = "anonymous";
+    else
+      principal = oprincipal.toString();
+    return principal;
   }
 
+  @GET
+  @Path("/")
+  public Response getNotebookList() throws IOException {
+    return new JsonResponse(Status.OK, "", notebook.getAllNotes() ).build();
+  }
+
+  /**
+   * Create new note REST API
+   * @param message - JSON with new note name
+   * @return JSON with new note ID
+   * @throws IOException
+   */
+  @POST
+  @Path("/")
+  public Response createNote(String message) throws IOException {
+    String principal = getPrincipal();
+    logger.info("Create new notebook by JSON {}" , message);
+    NewNotebookRequest request = gson.fromJson(message,
+            NewNotebookRequest.class);
+    Note note = notebook.createNote(principal);
+    note.addParagraph(); // it's an empty note. so add one paragraph
+    String noteName = request.getName();
+    if (noteName.isEmpty()) {
+      noteName = "Note " + note.getId();
+    }
+    note.setName(noteName);
+    note.persist();
+    notebookServer.broadcastNote(note);
+    notebookServer.broadcastNoteList(principal);
+    return new JsonResponse(Status.CREATED, "", note.getId() ).build();
+  }
+
+  /**
+   * Delete note REST API
+   * @param
+   * @return JSON with status.OK
+   * @throws IOException
+   */
+  @DELETE
+  @Path("{notebookId}")
+  public Response deleteNote(@PathParam("notebookId") String notebookId) throws IOException {
+    logger.info("Delete notebook {} ", notebookId);
+    String principal = getPrincipal();
+    if (!(notebookId.isEmpty())) {
+      Note note = notebook.getNote(notebookId, principal);
+      if (note != null) {
+        notebook.removeNote(notebookId, principal);
+      }
+    }
+    notebookServer.broadcastNoteList(principal);
+    return new JsonResponse(Status.OK, "").build();
+  }
+  /**
+   * Clone note REST API
+   * @param
+   * @return JSON with status.CREATED
+   * @throws IOException
+   */
+  @POST
+  @Path("{notebookId}")
+  public Response cloneNote(@PathParam("notebookId") String notebookId, String message) throws
+          IOException, CloneNotSupportedException, IllegalArgumentException {
+    logger.info("clone notebook by JSON {}" , message);
+    String principal = getPrincipal();
+    NewNotebookRequest request = gson.fromJson(message,
+            NewNotebookRequest.class);
+    String newNoteName = request.getName();
+    Note newNote = notebook.cloneNote(notebookId, newNoteName, principal);
+    notebookServer.broadcastNote(newNote);
+    notebookServer.broadcastNoteList(principal);
+    return new JsonResponse(Status.CREATED, "", newNote.getId()).build();
+  }
 }
