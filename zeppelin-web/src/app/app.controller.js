@@ -16,6 +16,15 @@
 angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootScope, $window) {
   $rootScope.compiledScope = $scope.$new(true, $rootScope);
   $scope.looknfeel = 'default';
+  // set the default theme   
+  $rootScope.newCSS = 'default';  
+
+  // create the list of themes  
+  $rootScope.newStyles = [  
+    { name: 'default', url: 'default' },  
+    { name: 'keedio', url: 'keedio' },
+    { name: 'produban', url: 'produban' }    
+  ];
 
   var init = function() {
     $scope.asIframe = (($window.location.href.indexOf('asIframe') > -1) ? true : false);
@@ -41,5 +50,9 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
   $rootScope.$on('$routeChangeStart', function(event, next, current) {
     $rootScope.$broadcast('setLookAndFeel', 'default');
   });
+
+  $rootScope.setNewCSS = function(newCSS) {
+    $rootScope.newCSS = newCSS;  
+  };
 
 });

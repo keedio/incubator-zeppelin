@@ -841,6 +841,7 @@ angular.module('zeppelinWebApp')
     if (!$scope.chart[type]) {
       var chart = nv.models[type]();
       $scope.chart[type] = chart;
+      $scope.chart[type].color(['#666484', '#55A08E']);
     }
 
     var d3g = [];

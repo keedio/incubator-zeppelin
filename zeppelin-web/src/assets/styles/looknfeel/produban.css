@@ -1,0 +1,305 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+/* ****************************************************************************
+ * Keedio Default Styles.
+ * ***************************************************************************/
+
+body {
+  /*background: #ecf0f1;*/  
+  color: #88182A;
+  background: none;   
+}
+
+a {
+  color: #C02844;
+}
+
+a:hover {
+  color: #88182A;    
+}
+
+h4 {  
+  font-size: 20px;
+  color: #CD6A00;
+}
+
+h5 {  
+  font-size: 14px;
+  color: #CD6A00;
+}
+
+.table-striped > tbody > tr:nth-child(odd) > th {
+  border-color: none;
+  background-color: #93421C;
+  color:#FFFFFF;
+}
+
+.table-striped > tbody > tr:nth-child(odd) > td {
+  border-color: none;
+  background-color: #CD6A00;
+}
+
+.table-striped > tbody > tr:nth-child(even) > td,
+.table-striped > tbody > tr:nth-child(even) > th {
+  border-color: none;  
+}
+
+.btn-primary {
+    background: #C02844;
+    color: #FFFFFF;
+    border-color: none;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background: #88182A;
+    border-color: none;
+}
+.btn-primary:active, .btn-primary.active {
+    background: #C02844;
+    box-shadow: none;
+    border-color: none;
+}
+.btn-success {
+    background: #99C2A8;
+    color: #FFFFFF;
+    border-color: none;
+}
+.btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .open > .dropdown-toggle.btn-success {
+    background: #0F7344;
+    border-color: none;
+}
+.btn-success:active, .btn-success.active {
+    background: #99C2A8;
+    box-shadow: none;
+    border-color: none;
+}
+.btn-info {
+    background: #CD6A00;
+    color: #FFFFFF;
+    border-color: none;
+}
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open > .dropdown-toggle.btn-info {
+    background: #352B5B;
+}
+.btn-info:active, .btn-info.active {
+    background: #CD6A00;
+    box-shadow: none;
+    border-color: none;
+}
+
+.btn-default {
+  background: #99C2A8;
+  color: #FFFFFF;
+  border-color: none;
+  border-style: solid;
+}
+
+.btn-default:hover, .btn-default:focus, .btn-default:active, 
+.btn-default.active, .open > .dropdown-toggle.btn-default {
+  background: #0F7344;
+  color: #FFFFFF;
+  border-color: none;
+  border-style: solid;
+}
+
+.btn-default:active, .btn-default.active {
+  background: #054529;
+  color: #FFFFFF;
+  box-shadow: none;
+  border-color: none;
+  border-style: solid;
+}
+
+/* ****************************************************************************
+ * Top Navbar.
+ * ***************************************************************************/
+body .navbar {
+  margin-bottom: 10px;
+  background-color: #58212A;
+}
+
+.navbar-title span {
+  display: none;
+}
+
+/*
+.navbar-title:after {
+  content: 'Produban';
+  margin-top: -7px;
+}
+*/
+
+.navbar-fixed-top .container .navbar-header .navbar-brand img {
+  content: url('/assets/images/produban/produban.png');
+  margin-top: -7px;
+}
+
+.navbar-inverse {
+  background-color: #CD6A00;
+  color: #FFFFFF;
+  border-color: #CD6A00;
+  font-size: 18px;
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+  color: #FFFFFF;
+  background-color: #CD6A00;
+}
+
+.navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+  background-color: #CD6A00;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.2);
+
+}
+
+.navbar-inverse .navbar-toggle {
+  border-color: #FFFFFF;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  color: #fff;
+  background-color: #CD6A00;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: #FFFFFF;
+}
+
+.navbar-inverse .navbar-brand {
+  color: #fff;
+  text-decoration: none;
+  font-size: 32px;
+  margin-top: -13px;
+}
+
+a.navbar-brand:hover {
+  color: #fff !important;
+}
+
+
+/* ****************************************************************************
+ * Home.
+ * ***************************************************************************/
+
+.home {
+  background-color: #EDEDED;
+}
+
+.box-heading{
+  color: #C02844;
+  position:relative;
+  max-width: 100%;
+  /*font-size: 20px;*/
+  font-weight:300;
+  white-space: nowrap;
+  /*overflow:hidden;*/
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  margin: 0 0 15px;
+  padding-bottom: 2px;
+}
+
+.zeppelin {
+  background-image: url('/assets/images/produban/produban-logo.png');
+  background-repeat: no-repeat;
+  background-position: right;
+  height: 410px;
+  opacity: 0.2;
+}
+
+.zeppelin2 {
+  background-image: none;
+}
+
+
+/* ****************************************************************************
+ * Interpreter.
+ * ***************************************************************************/
+
+.new_h3 {
+  margin-top: 1px;
+  padding-top: 7px;
+  color: #88182A;
+}
+
+.row {
+  margin-right: 0px !important;
+  font-weight: bold;
+  color: #93421C;
+}
+
+.interpreter .interpreter-title {
+  font-size:20px; 
+  color: #5D2819;
+  float:left;
+  margin-top:0px;
+}
+
+.interpreter .interpreter-title span {
+  color: #93421C;  
+}
+
+
+/* ****************************************************************************
+ * Paragraph.
+ * ***************************************************************************/
+
+.paragraph-margin {
+  background-color: #EDEDED;
+  border-radius: 12px;
+}
+
+/* ****************************************************************************
+ * Modal Window.
+ * ***************************************************************************/
+
+.modal-content {
+  background-color: #EDEDED;
+}
+
+.keys {
+  padding-right: 10px;
+  color: #054529;
+  text-align: right;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.kbd-dark {
+  color: #FFFFFF;
+  background-color: #99C2A8;
+  background-image: none;
+  border: 0;
+  font-weight: bold;
+}
+
+kbd {
+  background-color: #e7e7e7;
+  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+  background-image: linear-gradient(#fefefe, #e7e7e7);
+  background-repeat: repeat-x;
+  display: inline-block;
+  padding: 4px 5px;
+  font: 11px Dsignes Light;
+  font-weight: bold;
+  line-height: 10px;
+  color: #000;
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+}

@@ -56,6 +56,7 @@ limitations under the License.
     <link rel="stylesheet" href="fonts/custom-font.css">
     <!-- endbuild -->
     <link rel="stylesheet" ng-href="assets/styles/looknfeel/{{looknfeel}}.css">
+    <link rel="stylesheet" ng-href="assets/styles/looknfeel/{{newCSS}}.css">
     <link rel="stylesheet" href="assets/styles/fontImport.css" />
   </head>
   <body ng-class="{'bodyAsIframe': asIframe}" >
@@ -65,7 +66,7 @@ limitations under the License.
     <toast></toast>
     <div ng-include src="'components/navbar/navbar.html'"></div>
     <!-- Add your site or application content here -->
-    <div id="main" class="container">
+    <div id="main" class="container">      
       <div ng-view></div>
     </div>
     <!-- Modal ::  Keyboard shortcuts -->
