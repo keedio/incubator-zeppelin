@@ -49,7 +49,6 @@ public class Note implements Serializable, JobListener {
   Map<String, List<AngularObject>> angularObjects = new HashMap<String, List<AngularObject>>();
 
   private transient NoteInterpreterLoader replLoader;
-  private transient ZeppelinConfiguration conf;
   private transient JobListenerFactory jobListenerFactory;
   private transient NotebookRepo repo;
 
