@@ -19,11 +19,7 @@ package org.apache.zeppelin.notebook;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.display.AngularObject;
@@ -49,7 +45,7 @@ public class Note implements Serializable, JobListener {
   private String name;
   private String id;
   private String owner;
-
+  private List<String> owners = new ArrayList<>();
   Map<String, List<AngularObject>> angularObjects = new HashMap<String, List<AngularObject>>();
 
   private transient NoteInterpreterLoader replLoader;
@@ -81,6 +77,7 @@ public class Note implements Serializable, JobListener {
     this.replLoader = replLoader;
     this.jobListenerFactory = jobListenerFactory;
     this.owner = owner;
+    owners.add(owner);
     generateId();
   }
 
@@ -99,6 +96,14 @@ public class Note implements Serializable, JobListener {
   public String getOwner() { return this.owner; }
 
   public String setOwner() { return this.owner; }
+
+  public List<String> getOwners() {
+    return owners;
+  }
+
+  public void setOwners(List<String> owners) {
+    this.owners = owners;
+  }
 
   public String getName() {
     return name;
@@ -263,7 +268,7 @@ public class Note implements Serializable, JobListener {
   /**
    * Run all paragraphs sequentially.
    *
-   * @param jobListener
+   * @param
    */
   public void runAll() {
     synchronized (paragraphs) {
