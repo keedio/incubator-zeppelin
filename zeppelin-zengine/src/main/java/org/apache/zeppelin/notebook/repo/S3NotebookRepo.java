@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -199,5 +200,17 @@ public class S3NotebookRepo implements NotebookRepo {
       }
       objects = s3client.listNextBatchOfObjects(objects);
     } while (objects.isTruncated());
+  }
+
+  @Override
+  //TODO(luis Lázaro): what about share a note in aws?
+  public boolean share(String noteId, String owner, String newOwner) throws IOException {
+    return false;
+  }
+
+  @Override
+  //TODO(Luis Lázaro): list shared in aws
+  public List<NoteInfo> listShared(String owner) throws IOException {
+    return new ArrayList<>();
   }
 }
