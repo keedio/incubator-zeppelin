@@ -89,8 +89,9 @@ public class Input implements Serializable {
     this.options = options;
   }
 
+  
   public Input(String name, String displayName, String type, Object defaultValue,
-               ParamOption[] options, boolean hidden) {
+      ParamOption[] options, boolean hidden) {
     super();
     this.name = name;
     this.displayName = displayName;
@@ -149,6 +150,7 @@ public class Input implements Serializable {
     return hidden;
   }
 
+
   private static String[] getNameAndDisplayName(String str) {
     Pattern p = Pattern.compile("([^(]*)\\s*[(]([^)]*)[)]");
     Matcher m = p.matcher(str.trim());
@@ -203,6 +205,7 @@ public class Input implements Serializable {
         valuePart = null;
       }
 
+
       String varName;
       String displayName = null;
       String type = null;
@@ -248,6 +251,7 @@ public class Input implements Serializable {
               paramOptions[i] = new ParamOption(options[i], null);
             }
           }
+
 
         } else { // no option
           defaultValue = valuePart;
@@ -368,6 +372,7 @@ public class Input implements Serializable {
    * str.split("\\|(?=([^\"']*\"[^\"']*\")*[^\"']*$)"); }
    */
 
+
   public static String[] splitPipe(String str) {
     return split(str, '|');
   }
@@ -388,8 +393,7 @@ public class Input implements Serializable {
   }
 
   public static String[] split(String str, String escapeSeq, char escapeChar, String[] blockStart,
-             String[] blockEnd, String[] splitters,
-      boolean includeSplitter) {
+      String[] blockEnd, String[] splitters, boolean includeSplitter) {
 
     List<String> splits = new ArrayList<String>();
 
