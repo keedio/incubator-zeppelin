@@ -19,11 +19,7 @@ package org.apache.zeppelin.notebook;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.display.AngularObject;
@@ -48,37 +44,42 @@ public class Note implements Serializable, JobListener {
   List<Paragraph> paragraphs = new LinkedList<Paragraph>();
   private String name;
   private String id;
-
+  private String owner;
+  private List<String> owners = new ArrayList<>();
+  private Boolean isShared;
   Map<String, List<AngularObject>> angularObjects = new HashMap<String, List<AngularObject>>();
 
   private transient NoteInterpreterLoader replLoader;
-  private transient ZeppelinConfiguration conf;
   private transient JobListenerFactory jobListenerFactory;
   private transient NotebookRepo repo;
 
   /**
    * note configurations.
-   *
+   * <p/>
    * - looknfeel - cron
    */
   private Map<String, Object> config = new HashMap<String, Object>();
 
   /**
    * note information.
-   *
+   * <p/>
    * - cron : cron expression validity.
    */
   private Map<String, Object> info = new HashMap<String, Object>();
 
 
-  public Note() {}
+  public Note() {
+  }
 
   public Note(NotebookRepo repo,
-      NoteInterpreterLoader replLoader,
-      JobListenerFactory jobListenerFactory) {
+              NoteInterpreterLoader replLoader,
+              JobListenerFactory jobListenerFactory, String owner) {
     this.repo = repo;
     this.replLoader = replLoader;
     this.jobListenerFactory = jobListenerFactory;
+    this.owner = owner;
+    owners.add(owner);
+    isShared = false;
     generateId();
   }
 
@@ -89,9 +90,25 @@ public class Note implements Serializable, JobListener {
   public String id() {
     return id;
   }
-  
+
   public String getId() {
     return id;
+  }
+
+  public String getOwner() {
+    return this.owner;
+  }
+
+  public String setOwner() {
+    return this.owner;
+  }
+
+  public List<String> getOwners() {
+    return owners;
+  }
+
+  public void setOwners(List<String> owners) {
+    this.owners = owners;
   }
 
   public String getName() {
@@ -133,7 +150,7 @@ public class Note implements Serializable, JobListener {
   /**
    * Add paragraph last.
    *
-   * @param p
+   * @param
    */
   public Paragraph addParagraph() {
     Paragraph p = new Paragraph(this, this, replLoader);
@@ -153,12 +170,12 @@ public class Note implements Serializable, JobListener {
       paragraphs.add(p);
     }
   }
-  
+
   /**
    * Insert paragraph in given index.
    *
    * @param index
-   * @param p
+   * @param
    */
   public Paragraph insertParagraph(int index) {
     Paragraph p = new Paragraph(this, this, replLoader);
@@ -191,7 +208,7 @@ public class Note implements Serializable, JobListener {
    * Move paragraph into the new index (order from 0 ~ n-1).
    *
    * @param paragraphId
-   * @param index new index
+   * @param index       new index
    */
   public void moveParagraph(String paragraphId, int index) {
     synchronized (paragraphs) {
@@ -257,7 +274,7 @@ public class Note implements Serializable, JobListener {
   /**
    * Run all paragraphs sequentially.
    *
-   * @param jobListener
+   * @param
    */
   public void runAll() {
     synchronized (paragraphs) {
@@ -320,7 +337,7 @@ public class Note implements Serializable, JobListener {
   }
 
   public void unpersist() throws IOException {
-    repo.remove(id());
+    repo.remove(id(), this.owner);
   }
 
   public Map<String, Object> getConfig() {
@@ -361,6 +378,17 @@ public class Note implements Serializable, JobListener {
   }
 
   @Override
-  public void onProgressUpdate(Job job, int progress) {}
+  public void onProgressUpdate(Job job, int progress) {
+  }
+
+  /**
+   * getter for boolean isShared
+   * @return
+   */
+  public Boolean getIsShared() {
+    return isShared;
+  }
+
+
 
 }

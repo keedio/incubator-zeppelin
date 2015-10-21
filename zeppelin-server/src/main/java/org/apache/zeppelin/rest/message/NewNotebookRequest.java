@@ -26,13 +26,13 @@ import org.apache.zeppelin.interpreter.InterpreterOption;
  *
  */
 public class NewNotebookRequest {
-  String name;
+    String name;
 
-  public NewNotebookRequest (){
+    public NewNotebookRequest (){
 
-  }
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 }

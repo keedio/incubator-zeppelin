@@ -115,7 +115,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     }
     for (ConfigurationNode p : properties) {
       if (p.getChildren("name") != null && p.getChildren("name").size() > 0
-          && name.equals(p.getChildren("name").get(0).getValue())) {
+              && name.equals(p.getChildren("name").get(0).getValue())) {
         return (String) p.getChildren("value").get(0).getValue();
       }
     }
@@ -129,7 +129,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     }
     for (ConfigurationNode p : properties) {
       if (p.getChildren("name") != null && p.getChildren("name").size() > 0
-          && name.equals(p.getChildren("name").get(0).getValue())) {
+              && name.equals(p.getChildren("name").get(0).getValue())) {
         return Integer.parseInt((String) p.getChildren("value").get(0).getValue());
       }
     }
@@ -143,7 +143,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     }
     for (ConfigurationNode p : properties) {
       if (p.getChildren("name") != null && p.getChildren("name").size() > 0
-          && name.equals(p.getChildren("name").get(0).getValue())) {
+              && name.equals(p.getChildren("name").get(0).getValue())) {
         return Long.parseLong((String) p.getChildren("value").get(0).getValue());
       }
     }
@@ -157,7 +157,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     }
     for (ConfigurationNode p : properties) {
       if (p.getChildren("name") != null && p.getChildren("name").size() > 0
-          && name.equals(p.getChildren("name").get(0).getValue())) {
+              && name.equals(p.getChildren("name").get(0).getValue())) {
         return Float.parseFloat((String) p.getChildren("value").get(0).getValue());
       }
     }
@@ -171,7 +171,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     }
     for (ConfigurationNode p : properties) {
       if (p.getChildren("name") != null && p.getChildren("name").size() > 0
-          && name.equals(p.getChildren("name").get(0).getValue())) {
+              && name.equals(p.getChildren("name").get(0).getValue())) {
         return Boolean.parseBoolean((String) p.getChildren("value").get(0).getValue());
       }
     }
@@ -322,11 +322,11 @@ public class ZeppelinConfiguration extends XMLConfiguration {
   public String getNotebookDir() {
     return getString(ConfVars.ZEPPELIN_NOTEBOOK_DIR);
   }
-  
+
   public String getUser() {
     return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_USER);
   }
-  
+
   public String getBucketName() {
     return getString(ConfVars.ZEPPELIN_NOTEBOOK_S3_BUCKET);
   }
@@ -394,23 +394,23 @@ public class ZeppelinConfiguration extends XMLConfiguration {
     ZEPPELIN_SSL_TRUSTSTORE_PASSWORD("zeppelin.ssl.truststore.password", null),
     ZEPPELIN_WAR("zeppelin.war", "../zeppelin-web/dist"),
     ZEPPELIN_INTERPRETERS("zeppelin.interpreters", "org.apache.zeppelin.spark.SparkInterpreter,"
-        + "org.apache.zeppelin.spark.PySparkInterpreter,"
-        + "org.apache.zeppelin.spark.SparkSqlInterpreter,"
-        + "org.apache.zeppelin.spark.DepInterpreter,"
-        + "org.apache.zeppelin.markdown.Markdown,"
-        + "org.apache.zeppelin.angular.AngularInterpreter,"
-        + "org.apache.zeppelin.shell.ShellInterpreter,"
-        + "org.apache.zeppelin.hive.HiveInterpreter,"
-        + "org.apache.zeppelin.phoenix.PhoenixInterpreter,"
-        + "org.apache.zeppelin.tajo.TajoInterpreter,"
-        + "org.apache.zeppelin.flink.FlinkInterpreter,"
-        + "org.apache.zeppelin.ignite.IgniteInterpreter,"
-        + "org.apache.zeppelin.ignite.IgniteSqlInterpreter,"
-        + "org.apache.zeppelin.lens.LensInterpreter,"
-        + "org.apache.zeppelin.cassandra.CassandraInterpreter,"
-        + "org.apache.zeppelin.geode.GeodeOqlInterpreter,"
-        + "org.apache.zeppelin.postgresql.PostgreSqlInterpreter,"
-        + "org.apache.zeppelin.kylin.KylinInterpreter"),
+            + "org.apache.zeppelin.spark.PySparkInterpreter,"
+            + "org.apache.zeppelin.spark.SparkSqlInterpreter,"
+            + "org.apache.zeppelin.spark.DepInterpreter,"
+            + "org.apache.zeppelin.markdown.Markdown,"
+            + "org.apache.zeppelin.angular.AngularInterpreter,"
+            + "org.apache.zeppelin.shell.ShellInterpreter,"
+            + "org.apache.zeppelin.hive.HiveInterpreter,"
+            + "org.apache.zeppelin.phoenix.PhoenixInterpreter,"
+            + "org.apache.zeppelin.tajo.TajoInterpreter,"
+            + "org.apache.zeppelin.flink.FlinkInterpreter,"
+            + "org.apache.zeppelin.ignite.IgniteInterpreter,"
+            + "org.apache.zeppelin.ignite.IgniteSqlInterpreter,"
+            + "org.apache.zeppelin.lens.LensInterpreter,"
+            + "org.apache.zeppelin.cassandra.CassandraInterpreter,"
+            + "org.apache.zeppelin.geode.GeodeOqlInterpreter,"
+            + "org.apache.zeppelin.postgresql.PostgreSqlInterpreter,"
+            + "org.apache.zeppelin.kylin.KylinInterpreter"),
     ZEPPELIN_INTERPRETER_DIR("zeppelin.interpreter.dir", "interpreter"),
     ZEPPELIN_INTERPRETER_CONNECT_TIMEOUT("zeppelin.interpreter.connect.timeout", 30000),
     ZEPPELIN_ENCODING("zeppelin.encoding", "UTF-8"),

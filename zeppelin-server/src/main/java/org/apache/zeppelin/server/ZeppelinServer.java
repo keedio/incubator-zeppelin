@@ -41,6 +41,7 @@ import org.apache.zeppelin.rest.NotebookRestApi;
 import org.apache.zeppelin.rest.ZeppelinRestApi;
 import org.apache.zeppelin.scheduler.SchedulerFactory;
 import org.apache.zeppelin.socket.NotebookServer;
+import org.apache.zeppelin.rest.SecurityRestApi;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -134,7 +135,7 @@ public class ZeppelinServer extends Application {
   }
 
   private static Server setupJettyServer(ZeppelinConfiguration conf)
-      throws Exception {
+          throws Exception {
 
     AbstractConnector connector;
     if (conf.useSsl()) {
@@ -158,25 +159,25 @@ public class ZeppelinServer extends Application {
   }
 
   private static ServletContextHandler setupNotebookServer(ZeppelinConfiguration conf)
-      throws Exception {
+          throws Exception {
 
     notebookServer = new NotebookServer();
     final ServletHolder servletHolder = new ServletHolder(notebookServer);
     servletHolder.setInitParameter("maxTextMessageSize", "1024000");
 
     final ServletContextHandler cxfContext = new ServletContextHandler(
-        ServletContextHandler.SESSIONS);
+            ServletContextHandler.SESSIONS);
 
     cxfContext.setSessionHandler(new SessionHandler());
     cxfContext.setContextPath("/");
     cxfContext.addServlet(servletHolder, "/ws/*");
     cxfContext.addFilter(new FilterHolder(CorsFilter.class), "/*",
-        EnumSet.allOf(DispatcherType.class));
+            EnumSet.allOf(DispatcherType.class));
     return cxfContext;
   }
 
   private static SslContextFactory getSslContextFactory(ZeppelinConfiguration conf)
-      throws Exception {
+          throws Exception {
 
     // Note that the API for the SslContextFactory is different for
     // Jetty version 9
@@ -199,7 +200,7 @@ public class ZeppelinServer extends Application {
   }
 
   private static SSLContext getSslContext(ZeppelinConfiguration conf)
-      throws Exception {
+          throws Exception {
 
     SslContextFactory scf = getSslContextFactory(conf);
     if (!scf.isStarted()) {
@@ -220,12 +221,18 @@ public class ZeppelinServer extends Application {
     cxfContext.addServlet(cxfServletHolder, "/*");
 
     cxfContext.addFilter(new FilterHolder(CorsFilter.class), "/*",
-        EnumSet.allOf(DispatcherType.class));
+            EnumSet.allOf(DispatcherType.class));
+
+    cxfContext.addFilter(org.apache.shiro.web.servlet.ShiroFilter.class, "/*",
+            EnumSet.allOf(DispatcherType.class));
+
+    cxfContext.addEventListener(new org.apache.shiro.web.env.EnvironmentLoaderListener());
+
     return cxfContext;
   }
 
   private static WebAppContext setupWebAppContext(
-      ZeppelinConfiguration conf) {
+          ZeppelinConfiguration conf) {
 
     WebAppContext webApp = new WebAppContext();
     File warPath = new File(conf.getString(ConfVars.ZEPPELIN_WAR));
@@ -241,8 +248,8 @@ public class ZeppelinServer extends Application {
     }
     // Explicit bind to root
     webApp.addServlet(
-      new ServletHolder(new DefaultServlet()),
-      "/*"
+            new ServletHolder(new DefaultServlet()),
+            "/*"
     );
     return webApp;
   }
@@ -277,7 +284,9 @@ public class ZeppelinServer extends Application {
     InterpreterRestApi interpreterApi = new InterpreterRestApi(replFactory);
     singletons.add(interpreterApi);
 
+    SecurityRestApi securityApi = new SecurityRestApi();
+    singletons.add(securityApi);
+
     return singletons;
   }
 }
-
