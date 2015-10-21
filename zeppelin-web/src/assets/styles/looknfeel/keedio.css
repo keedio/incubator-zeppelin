@@ -278,9 +278,14 @@ a.navbar-brand:hover {
  * Paragraph.
  * ***************************************************************************/
 
+.paragraph-col {
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+}
+
 .paragraph-margin {
   background-color: #EDEDED;
-  border-radius: 12px;
+  border-radius: 12px;  
 }
 
 .table-condensed > thead > tr > th {

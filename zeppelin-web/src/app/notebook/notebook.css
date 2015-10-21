@@ -12,6 +12,12 @@
  * limitations under the License.
  */
 
+#explorer_paragraphColumn { 
+  overflow:auto; 
+  width:100%; 
+  height:98vh;
+}
+
 .paragraph-col {
   margin: 0 0 0 0px;
   padding: 0 0 0 0px;
