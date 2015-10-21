@@ -15,7 +15,7 @@
 
 'use strict';
 
-angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http) {
+angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http, baseUrlSrv) {
   if (!$rootScope.ticket) {
       $rootScope.ticket = {
                 'principal':'anonymous',
@@ -29,7 +29,7 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
   vm.connected = websocketMsgSrv.isConnected();
   vm.websocketMsgSrv = websocketMsgSrv;
   vm.arrayOrderingSrv = arrayOrderingSrv;
-  
+
   $('#notebook-list').perfectScrollbar({suppressScrollX: true});
 
   $scope.$on('setNoteMenu', function(event, notes) {
@@ -47,7 +47,8 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
   /** ask for a ticket for websocket access
    * Shiro will require credentials here
    * */
-  $http.get('/api/security/ticket').
+  $http.get(baseUrlSrv.getRestApiBase()+'/security/ticket').
+
     success(function(ticket, status, headers, config) {
       $rootScope.ticket = angular.fromJson(ticket).body;
       vm.loadNotes = loadNotes;
