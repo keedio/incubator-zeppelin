@@ -45,6 +45,7 @@ limitations under the License.
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="bower_components/c3/c3.css" />
     <link rel="stylesheet" href="bower_components/pivottable/dist/pivot.css" />
+    <link rel="stylesheet" href="bower_components/ngtoast/dist/ngToast.css" />
     <!-- endbower -->
     <link rel="stylesheet" href="bower_components/jquery-ui/themes/base/all.css" />
     <!-- endbuild -->
@@ -72,7 +73,9 @@ limitations under the License.
     </div>
     <!-- Modal ::  Keyboard shortcuts -->
     <div ng-include src="'components/modal-shortcut/modal-shortcut.html'"></div>
-    <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
+    <div ng-controller="NotenameCtrl as notenamectrl">
++                <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
++    </div>
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -129,6 +132,7 @@ limitations under the License.
     <script src="bower_components/highcharts/highcharts.js"></script>
     <script src="bower_components/highcharts/highcharts-more.js"></script>
     <script src="bower_components/highcharts/modules/exporting.js"></script>
+    <script src="bower_components/ngtoast/dist/ngToast.js"></script>
     <!-- endbower -->
 
     <!-- endbuild -->

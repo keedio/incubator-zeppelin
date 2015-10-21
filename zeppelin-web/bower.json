@@ -35,7 +35,8 @@
     "pivottable": "1.6.3",
     "google-apis": "1.0.2",
     "highcharts": "4.1.9",
-    "jqwidgets": "master"
+    "jqwidgets": "master",
+    "ngtoast": "~1.5.5"
   },
   "devDependencies": {
     "angular-mocks": "1.3.8"
