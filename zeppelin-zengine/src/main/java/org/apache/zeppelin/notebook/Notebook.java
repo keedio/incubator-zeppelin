@@ -59,9 +59,8 @@ public class Notebook {
   private NotebookRepo notebookRepo;
 
   public Notebook(ZeppelinConfiguration conf, NotebookRepo notebookRepo,
-                  SchedulerFactory schedulerFactory,
-                  InterpreterFactory replFactory, JobListenerFactory jobListenerFactory) throws IOException,
-          SchedulerException {
+   SchedulerFactory schedulerFactory, InterpreterFactory replFactory,
+   JobListenerFactory jobListenerFactory) throws IOException, SchedulerException {
     this.conf = conf;
     this.notebookRepo = notebookRepo;
     this.schedulerFactory = schedulerFactory;
@@ -152,7 +151,8 @@ public class Notebook {
   }
 
   public void bindInterpretersToNote(String id,
-                                     List<String> interpreterSettingIds, String principal) throws IOException {
+          List<String> interpreterSettingIds, String principal)
+          throws IOException {
     Note note = getNote(id, principal);
     if (note != null) {
       note.getNoteReplLoader().setInterpreters(interpreterSettingIds);
@@ -523,13 +523,13 @@ public class Notebook {
     }
     return noteList;
   }
-  /**
-   *
-   * @param id
-   * @param principal
-   * @param newPrincipal
-   * @return
-   */
+ /**
+  *
+  * @param id
+  * @param principal
+  * @param newPrincipal
+  * @return
+  */
   public boolean shareNote(String id, String principal, String newPrincipal){
    Note note = getUserNotes(principal).get(id);
    note.getOwners().add(newPrincipal);
