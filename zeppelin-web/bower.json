@@ -33,7 +33,6 @@
     "Leaflet.MakiMarkers": "1.0.1",
     "c3": "0.4.11-rc4",
     "pivottable": "1.6.3",
-    "google-apis": "1.0.2",
     "highcharts": "4.1.9",
     "ngtoast": "~1.5.5"
   },
