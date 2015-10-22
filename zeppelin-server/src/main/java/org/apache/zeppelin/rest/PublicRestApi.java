@@ -24,6 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.util.Base64;
 import java.util.HashMap;
@@ -58,7 +59,7 @@ public class PublicRestApi {
 
             String username = props.getProperty("development.username");
             String password = props.getProperty("development.password");
-            token = Base64.getEncoder().encodeToString( (username + ":" + password).getBytes() );
+            token = DatatypeConverter.printBase64Binary((username + ":" + password).getBytes() );
 
         } catch (Exception e) {
             LOG.error("Catched exception, devMode will be set to 'false'",e);
