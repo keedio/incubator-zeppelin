@@ -19,14 +19,12 @@ package org.apache.zeppelin.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.DispatcherType;
-import javax.servlet.Servlet;
 import javax.ws.rs.core.Application;
 
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
@@ -36,12 +34,9 @@ import org.apache.zeppelin.interpreter.InterpreterFactory;
 import org.apache.zeppelin.notebook.Notebook;
 import org.apache.zeppelin.notebook.repo.NotebookRepo;
 import org.apache.zeppelin.notebook.repo.NotebookRepoSync;
-import org.apache.zeppelin.rest.InterpreterRestApi;
-import org.apache.zeppelin.rest.NotebookRestApi;
-import org.apache.zeppelin.rest.ZeppelinRestApi;
+import org.apache.zeppelin.rest.*;
 import org.apache.zeppelin.scheduler.SchedulerFactory;
 import org.apache.zeppelin.socket.NotebookServer;
-import org.apache.zeppelin.rest.SecurityRestApi;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -88,6 +83,9 @@ public class ZeppelinServer extends Application {
     // REST api
     final ServletContextHandler restApi = setupRestApiContextHandler();
 
+    // REST api
+    final ServletContextHandler unprivilegedRestApi = setupUnprivilegedRestApiContextHandler();
+
     // Notebook server
     final ServletContextHandler notebook = setupNotebookServer(conf);
 
@@ -96,7 +94,7 @@ public class ZeppelinServer extends Application {
 
     // add all handlers
     ContextHandlerCollection contexts = new ContextHandlerCollection();
-    contexts.setHandlers(new Handler[]{restApi, notebook, webApp});
+    contexts.setHandlers(new Handler[]{restApi, unprivilegedRestApi, notebook, webApp});
     jettyServer.setHandler(contexts);
 
     LOG.info("Start zeppelin server");
@@ -231,6 +229,24 @@ public class ZeppelinServer extends Application {
     return cxfContext;
   }
 
+  private static ServletContextHandler setupUnprivilegedRestApiContextHandler() {
+
+    final ServletHolder cxfServletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
+    cxfServletHolder.setInitParameter("javax.ws.rs.Application", ZeppelinServer.class.getName());
+    cxfServletHolder.setName("rests");
+    cxfServletHolder.setForcedPath("rests");
+
+    final ServletContextHandler cxfContext = new ServletContextHandler();
+    cxfContext.setSessionHandler(new SessionHandler());
+    cxfContext.setContextPath("/publicapi");
+    cxfContext.addServlet(cxfServletHolder, "/*");
+
+    cxfContext.addFilter(new FilterHolder(CorsFilter.class), "/*",
+            EnumSet.allOf(DispatcherType.class));
+
+    return cxfContext;
+  }
+
   private static WebAppContext setupWebAppContext(
           ZeppelinConfiguration conf) {
 
@@ -286,6 +302,9 @@ public class ZeppelinServer extends Application {
 
     SecurityRestApi securityApi = new SecurityRestApi();
     singletons.add(securityApi);
+
+    UnprivilegedRestApi nonPrivilegedRestAPi = new UnprivilegedRestApi();
+    singletons.add(nonPrivilegedRestAPi);
 
     return singletons;
   }

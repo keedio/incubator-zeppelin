@@ -15,7 +15,23 @@
 
 'use strict';
 
-angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http, baseUrlSrv) {
+angular.module('zeppelinWebApp')
+.run(['$http','baseUrlSrv', function($http, baseUrlSrv) {
+    $http.get(baseUrlSrv.getUnprivilegedRestApiBase() + '/environment/ticket').
+
+        success(function(ticket, status, headers, config) {
+          var msgbody = angular.fromJson(ticket).body;
+
+          if (msgbody.isDevelopment === 'true') {
+            $http.defaults.headers.common['Authorization'] = 'Basic ' + msgbody.ticket;
+          }
+        }).
+        error(function(data, status, headers, config) {
+          console.log('Could not get ticket');
+        });
+
+}]).controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, baseUrlSrv, $http) {
+
   if (!$rootScope.ticket) {
       $rootScope.ticket = {
                 'principal':'anonymous',
@@ -47,7 +63,7 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
   /** ask for a ticket for websocket access
    * Shiro will require credentials here
    * */
-  $http.get(baseUrlSrv.getRestApiBase()+'/security/ticket').
+  $http.get(baseUrlSrv.getRestApiBase() + '/security/ticket').
 
     success(function(ticket, status, headers, config) {
       $rootScope.ticket = angular.fromJson(ticket).body;

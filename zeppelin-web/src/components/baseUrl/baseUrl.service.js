@@ -39,6 +39,10 @@ angular.module('zeppelinWebApp').service('baseUrlSrv', function() {
     return location.protocol + '//' + location.hostname + ':' + this.getPort() + skipTrailingSlash(location.pathname) + '/api';
   };
 
+  this.getUnprivilegedRestApiBase = function() {
+      return location.protocol + '//' + location.hostname + ':' + this.getPort() + skipTrailingSlash(location.pathname) + '/publicapi';
+    };
+
   var skipTrailingSlash = function(path) {
     return path.replace(/\/$/, '');
   };

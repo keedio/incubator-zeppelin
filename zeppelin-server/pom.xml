@@ -275,6 +275,14 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>application.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.rat</groupId>
@@ -292,6 +300,7 @@
             <exclude>**/derby.log</exclude>
             <exclude>**/metastore_db/</exclude>
             <exclude>**/README.md</exclude>
+            <exclude>**/application.properties</exclude>
             <exclude>src/test/java/com/webautomation/*</exclude>
           </excludes>
         </configuration>
