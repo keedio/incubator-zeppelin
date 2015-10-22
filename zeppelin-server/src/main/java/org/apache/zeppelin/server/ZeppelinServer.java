@@ -303,7 +303,7 @@ public class ZeppelinServer extends Application {
     SecurityRestApi securityApi = new SecurityRestApi();
     singletons.add(securityApi);
 
-    UnprivilegedRestApi nonPrivilegedRestAPi = new UnprivilegedRestApi();
+    PublicRestApi nonPrivilegedRestAPi = new PublicRestApi();
     singletons.add(nonPrivilegedRestAPi);
 
     return singletons;

@@ -38,15 +38,15 @@ import java.util.Properties;
  */
 @Path("/environment")
 @Produces("application/json")
-public class UnprivilegedRestApi {
-    private static final Logger LOG = LoggerFactory.getLogger(UnprivilegedRestApi.class);
+public class PublicRestApi {
+    private static final Logger LOG = LoggerFactory.getLogger(PublicRestApi.class);
 
     private final static String PROP_FILENAME = "application.properties";
     private Boolean devMode = Boolean.FALSE;
 
     private String token;
 
-    public UnprivilegedRestApi() {
+    public PublicRestApi() {
 
         try (Reader r = new InputStreamReader(
             this.getClass().getClassLoader().getResourceAsStream(PROP_FILENAME))){
