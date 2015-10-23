@@ -52,6 +52,7 @@ angular.module('app.module.datamap')
   };
 
   this.draw = function (data, id) {
+    this.undraw(id)
     var div = document.getElementById(id);
     div.style.width = '600px';
     div.style.height = '300px';

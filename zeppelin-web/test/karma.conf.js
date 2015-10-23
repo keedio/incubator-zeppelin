@@ -67,6 +67,8 @@ module.exports = function(config) {
       'bower_components/highcharts/highcharts.js',
       'bower_components/highcharts/highcharts-more.js',
       'bower_components/highcharts/modules/exporting.js',
+      'bower_components/ngtoast/dist/ngToast.js',
+      'bower_components/angular-base64/angular-base64.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/app/app.js',

@@ -15,13 +15,14 @@
 
 'use strict';
 
-angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http) {
-  if (!$rootScope.ticket) {
-      $rootScope.ticket = {
-                'principal':'anonymous',
-                'ticket':'anonymous'
-              };
-   }
+angular.module('zeppelinWebApp')
+.run(function($http, LS, $base64) {
+  
+  var encoded = $base64.encode(LS.getData('userInfo.principal') + ":" + LS.getData('userInfo.password'));
+  $http.defaults.headers.common.Authorization = 'Basic ' + encoded;
+})
+.controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http, baseUrlSrv, LS, $location, $route) {
+ 
   /** Current list of notes (ids) */
 
   var vm = this;
@@ -30,7 +31,13 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
   vm.websocketMsgSrv = websocketMsgSrv;
   vm.arrayOrderingSrv = arrayOrderingSrv;
   
-  $('#notebook-list').perfectScrollbar({suppressScrollX: true});
+  //$('#notebook-list').perfectScrollbar({suppressScrollX: true});
+  $scope.logout = function() {
+    LS.clear();
+    delete $rootScope.ticket;
+    delete $http.defaults.headers.common.Authorization;
+    $http.get(baseUrlSrv.getRestApiBase()+'/security/ticket');
+  }
 
   $scope.$on('setNoteMenu', function(event, notes) {
     notebookListDataFactory.setNotes(notes);
@@ -47,7 +54,12 @@ angular.module('zeppelinWebApp').controller('NavCtrl', function($scope, $rootSco
   /** ask for a ticket for websocket access
    * Shiro will require credentials here
    * */
-  $http.get('/api/security/ticket').
+
+/** chapu **/
+
+//$http.defaults.headers.common['Authorization'] = 'Basic ZGV2ZWxvcDpkZXZlbG9w';
+
+  $http.get(baseUrlSrv.getRestApiBase() + '/security/ticket').
     success(function(ticket, status, headers, config) {
       $rootScope.ticket = angular.fromJson(ticket).body;
       vm.loadNotes = loadNotes;

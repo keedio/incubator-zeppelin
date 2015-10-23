@@ -385,6 +385,7 @@ public class NotebookServer extends WebSocketServlet implements
       sendAllAngularObjects(note, conn);
     } else {
       conn.send(serializeMessage(new Message(OP.NOTE).put("note", null)));
+      broadcastNoteList(fromMessage.principal);
     }
   }
 
