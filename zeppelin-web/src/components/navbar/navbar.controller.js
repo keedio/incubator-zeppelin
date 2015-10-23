@@ -30,7 +30,7 @@ angular.module('zeppelinWebApp')
   vm.connected = websocketMsgSrv.isConnected();
   vm.websocketMsgSrv = websocketMsgSrv;
   vm.arrayOrderingSrv = arrayOrderingSrv;
-  
+
   //$('#notebook-list').perfectScrollbar({suppressScrollX: true});
   $scope.logout = function() {
     LS.clear();
@@ -54,11 +54,6 @@ angular.module('zeppelinWebApp')
   /** ask for a ticket for websocket access
    * Shiro will require credentials here
    * */
-
-/** chapu **/
-
-//$http.defaults.headers.common['Authorization'] = 'Basic ZGV2ZWxvcDpkZXZlbG9w';
-
   $http.get(baseUrlSrv.getRestApiBase() + '/security/ticket').
     success(function(ticket, status, headers, config) {
       $rootScope.ticket = angular.fromJson(ticket).body;

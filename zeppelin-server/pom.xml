@@ -277,6 +277,16 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>src/main/resources/application.properties</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <configuration>
@@ -292,6 +302,7 @@
             <exclude>**/derby.log</exclude>
             <exclude>**/metastore_db/</exclude>
             <exclude>**/README.md</exclude>
+            <exclude>**/application.properties</exclude>
             <exclude>src/test/java/com/webautomation/*</exclude>
           </excludes>
         </configuration>

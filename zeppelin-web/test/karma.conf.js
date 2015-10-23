@@ -63,7 +63,6 @@ module.exports = function(config) {
       'bower_components/c3/c3.js',
       'bower_components/jqueryui/jquery-ui.js',
       'bower_components/pivottable/dist/pivot.js',
-      'bower_components/webcomponentsjs/webcomponents.js',
       'bower_components/highcharts/highcharts.js',
       'bower_components/highcharts/highcharts-more.js',
       'bower_components/highcharts/modules/exporting.js',
