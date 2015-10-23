@@ -54,6 +54,7 @@ limitations under the License.
     <link rel="stylesheet" href="app/notebook/notebook.css">
     <link rel="stylesheet" href="app/notebook/paragraph/paragraph.css">
     <link rel="stylesheet" href="app/interpreter/interpreter.css">
+    <link rel="stylesheet" href="app/login/login.css">
     <link rel="stylesheet" href="fonts/font-awesome.min.css">
     <link rel="stylesheet" href="fonts/simple-line-icons.css">
     <link rel="stylesheet" href="fonts/custom-font.css">
@@ -74,8 +75,8 @@ limitations under the License.
     <!-- Modal ::  Keyboard shortcuts -->
     <div ng-include src="'components/modal-shortcut/modal-shortcut.html'"></div>
     <div ng-controller="NotenameCtrl as notenamectrl">
-+                <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
-+    </div>
+                <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
+    </div>
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -128,11 +129,11 @@ limitations under the License.
     <script src="bower_components/c3/c3.js"></script>
     <script src="bower_components/jqueryui/jquery-ui.js"></script>
     <script src="bower_components/pivottable/dist/pivot.js"></script>
-    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
     <script src="bower_components/highcharts/highcharts.js"></script>
     <script src="bower_components/highcharts/highcharts-more.js"></script>
     <script src="bower_components/highcharts/modules/exporting.js"></script>
     <script src="bower_components/ngtoast/dist/ngToast.js"></script>
+    <script src="bower_components/angular-base64/angular-base64.js"></script>
     <!-- endbower -->
 
     <!-- endbuild -->
@@ -142,6 +143,7 @@ limitations under the License.
     <script src="app/home/home.controller.js"></script>
     <script src="app/notebook/notebook.controller.js"></script>
     <script src="app/interpreter/interpreter.controller.js"></script>
+    <script src="app/login/login.controller.js"></script>
     <script src="app/notebook/paragraph/paragraph.controller.js"></script>
     <script src="app/components/main.module.js"></script>    
     <script src="app/components/datamap/main.datamap.module.js"></script>
@@ -157,6 +159,7 @@ limitations under the License.
     <script src="components/noteName-create/notename.controller.js"></script>
     <script src="components/arrayOrderingSrv/arrayOrdering.service.js"></script>
     <script src="components/popover-html-unsafe/popover-html-unsafe.directive.js"></script>
+    <script src="components/login/login.service.js"></script>
     <script src="components/ngenter/ngenter.directive.js"></script>
     <script src="components/dropdowninput/dropdowninput.directive.js"></script>
     <script src="components/resizable/resizable.directive.js"></script>

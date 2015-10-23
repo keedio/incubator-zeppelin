@@ -13,7 +13,7 @@
  */
 'use strict';
 
-angular.module('zeppelinWebApp').factory('websocketEvents', function($rootScope, $websocket, baseUrlSrv) {
+angular.module('zeppelinWebApp').factory('websocketEvents', function($rootScope, $websocket, baseUrlSrv, loginSrv) {
   var websocketCalls = {};
 
   websocketCalls.ws = $websocket(baseUrlSrv.getWebsocketUrl());
@@ -28,8 +28,8 @@ angular.module('zeppelinWebApp').factory('websocketEvents', function($rootScope,
   });
 
   websocketCalls.sendNewEvent = function(data) {
-    data.principal = $rootScope.ticket.principal;
-    data.ticket = $rootScope.ticket.ticket;
+    data.principal = loginSrv.getUser().principal;
+    data.ticket = loginSrv.getUser().ticket;
     console.log('Send >> %o, %o, %o, %o', data.op, data.principal, data.ticket, data);
     websocketCalls.ws.send(JSON.stringify(data));
   };
