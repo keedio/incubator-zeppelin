@@ -7,6 +7,10 @@ describe('Controller: ParagraphCtrl', function() {
   var ParagraphCtrl;
   var scope;
   var websocketMsgSrvMock = {};
+  var dataMapSrvMock = {};
+  var leafletMapSrvMock = {};
+  var multipleSrvMock = {};
+  var pivotSrvMock = {};
   var paragraphMock = {
     config: {}
   };
@@ -16,6 +20,10 @@ describe('Controller: ParagraphCtrl', function() {
     ParagraphCtrl = $controller('ParagraphCtrl', {
       $scope: scope,
       websocketMsgSrv: websocketMsgSrvMock,
+      dataMapSrv: dataMapSrvMock,
+      leafletMapSrv: leafletMapSrvMock,
+      multipleSrv: multipleSrvMock,
+      pivotSrv: pivotSrvMock,
       $element: {}
     });
     scope.init(paragraphMock);

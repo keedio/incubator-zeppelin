@@ -19,11 +19,12 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
   // set the default theme   
   $rootScope.newCSS = 'default';  
 
-  // create the list of themes  
+  // create the list of themes. Same name that css file.  
   $rootScope.newStyles = [  
-    { name: 'default', url: 'default' },  
-    { name: 'keedio', url: 'keedio' },
-    { name: 'produban', url: 'produban' }    
+    { name: 'default', url: 'default', arrayColors: []},  
+    { name: 'keedio', url: 'keedio', arrayColors: ['#87BAAC', '#666484', '#55A08E', '#352B5B']},
+    { name: 'kata', url: 'kata', arrayColors: ['#573C84', '#B3A3D1', '#3E2E60', '#896FCD', '#837D93', '#7C2DAA']},
+    { name: 'produban', url: 'produban', arrayColors: ['#C02844', '#58212A', '#88182A', '#D284A1']}    
   ];
 
   var init = function() {

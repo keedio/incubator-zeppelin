@@ -13,7 +13,7 @@
  */
 'use strict';
 
-angular.module('zeppelinWebApp').controller('HomeCtrl', function($scope, notebookListDataFactory, websocketMsgSrv, $rootScope, arrayOrderingSrv) {
+angular.module('zeppelinWebApp').controller('HomeCtrl', function($scope, notebookListDataFactory, websocketMsgSrv, $rootScope, arrayOrderingSrv, dataMapSrv, pivotSrv, leafletMapSrv, multipleSrv) {
  if (!$rootScope.ticket) {
       $rootScope.ticket = {
                 'principal':'anonymous',
@@ -25,6 +25,11 @@ angular.module('zeppelinWebApp').controller('HomeCtrl', function($scope, noteboo
   vm.notes = notebookListDataFactory;
   vm.websocketMsgSrv = websocketMsgSrv;
   vm.arrayOrderingSrv = arrayOrderingSrv;
+
+  vm.dataMapSrv = dataMapSrv;
+  vm.leafletMapSrv = leafletMapSrv;
+  vm.multipleSrv = multipleSrv;
+  vm.pivotSrv = pivotSrv;
 
   vm.notebookHome = false;
   vm.staticHome = false;

@@ -74,8 +74,8 @@ limitations under the License.
     <!-- Modal ::  Keyboard shortcuts -->
     <div ng-include src="'components/modal-shortcut/modal-shortcut.html'"></div>
     <div ng-controller="NotenameCtrl as notenamectrl">
-+                <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
-+    </div>
+    <div id="note-modal-container" ng-include src="'components/noteName-create/note-name-dialog.html'"></div>
+    </div>
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -141,16 +141,11 @@ limitations under the License.
     <script src="app/home/home.controller.js"></script>
     <script src="app/notebook/notebook.controller.js"></script>
     <script src="app/interpreter/interpreter.controller.js"></script>
-    <script src="app/notebook/paragraph/paragraph.controller.js"></script>
-    <script src="app/components/main.module.js"></script>    
-    <script src="app/components/datamap/main.datamap.module.js"></script>
-    <script src="app/components/datamap/DatamapService.js"></script>
-    <script src="app/components/leaflet/main.leaflet.module.js"></script>
-    <script src="app/components/leaflet/LeafletService.js"></script>    
-    <script src="app/components/utility/main.utility.module.js"></script>
-    <script src="app/components/utility/PivotService.js"></script>
-    <script src="app/components/multiple/main.multiple.module.js"></script>
-    <script src="app/components/multiple/MultipleService.js"></script>    
+    <script src="app/notebook/paragraph/paragraph.controller.js"></script>    
+    <script src="components/dataMapSrv/dataMap.service.js"></script>    
+    <script src="components/leafletMapSrv/leafletMap.service.js"></script> 
+    <script src="components/pivotSrv/pivot.service.js"></script>        
+    <script src="components/multipleSrv/multiple.service.js"></script>    
     <script src="components/navbar/navbar.controller.js"></script>
     <script src="components/ngescape/ngescape.directive.js"></script>
     <script src="components/noteName-create/notename.controller.js"></script>

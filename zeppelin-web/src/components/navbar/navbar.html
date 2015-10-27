@@ -44,10 +44,11 @@ limitations under the License.
           <a href="#/interpreter">Interpreter</a>
         </li>
       </ul>
+      
       <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
         <li class="server-status">
           <i class="fa fa-circle" ng-class="{'server-connected':navbar.connected, 'server-disconnected':!navbar.connected}"></i>
-          <span ng-show="navbar.connected">{{ticket.principal}} Connected</span>
+          <span ng-show="navbar.connected">User {{ticket.principal}} connected</span>
           <span ng-show="!navbar.connected">Disconnected</span>
         </li>
       </ul>
@@ -55,7 +56,8 @@ limitations under the License.
       <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
         <li>
           <span class="btn-group">
-            <button type="button"
+            <button id="btnStyles"
+                    type="button"
                     class="btn btn-default btn-xs dropdown-toggle"
                     data-toggle="dropdown">
               {{newCSS}} <span class="caret"></span>

@@ -15,12 +15,11 @@
  */
 'use strict';
 
-angular.module('zeppelinWebApp')
-  .controller('ParagraphCtrl', function($scope,$rootScope, $route, $window, $element, $routeParams, $location,
-                                         $timeout, $compile, websocketMsgSrv, _, DatamapService, PivotService, LeafletService, MultipleService) {
+angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope,$rootScope, $route, $window, $element, $routeParams, $location,
+                                         $timeout, $compile, websocketMsgSrv, _, dataMapSrv, pivotSrv, leafletMapSrv, multipleSrv) {
 
   $scope.paragraph = null;
-  $scope.editor = null;
+  $scope.editor = null;    
 
   var editorMode = {scala: 'ace/mode/scala', sql: 'ace/mode/sql', markdown: 'ace/mode/markdown', 
 		  sh: 'ace/mode/sh'};
@@ -898,9 +897,9 @@ angular.module('zeppelinWebApp')
   var setMapChart = function(type, data, refresh) { 
     var aux;
     try {
-      aux = DatamapService.getData(data, $scope.paragraph.config.graph.keys[0].name, $scope.paragraph.config.graph.values[0].name);
+      aux = dataMapSrv.getData(data, $scope.paragraph.config.graph.keys[0].name, $scope.paragraph.config.graph.values[0].name);
     } catch (err) {
-      DatamapService.undraw('p' + $scope.paragraph.id + '_mapChart')
+      dataMapSrv.undraw('p' + $scope.paragraph.id + '_mapChart')
       $scope.paragraph.status = 'ERROR';
       $scope.paragraph.errorMessage = 'No data available';
       return;
@@ -909,7 +908,7 @@ angular.module('zeppelinWebApp')
     var id = $scope.paragraph.jobName;
 
     var renderTable = function() {
-      DatamapService.draw(aux, 'p' + $scope.paragraph.id + '_mapChart')
+      dataMapSrv.draw(aux, 'p' + $scope.paragraph.id + '_mapChart')
     };
 
     var retryRenderer = function() {
@@ -937,16 +936,16 @@ angular.module('zeppelinWebApp')
       txt = $scope.paragraph.config.graph.text[0].name;
       val = $scope.paragraph.config.graph.values[0].name;
     } catch (err) {
-      LeafletService.undraw('p' + $scope.paragraph.id + '_mapLeaflet')
+      leafletMapSrv.undraw('p' + $scope.paragraph.id + '_mapLeaflet')
       $scope.paragraph.status = 'ERROR';
       $scope.paragraph.errorMessage = 'No data available';
       return;
     }
 
-    var json = PivotService.crossData(data);
+    var json = pivotSrv.crossData(data);
 /*
     try {
-      PivotService.validateType(json, $scope.paragraph.config.graph.latitude[0].name, 'number');
+      pivotSrv.validateType(json, $scope.paragraph.config.graph.latitude[0].name, 'number');
     } catch (err) {
       $scope.paragraph.status = 'ERROR';
       $scope.paragraph.errorMessage = err;
@@ -954,7 +953,7 @@ angular.module('zeppelinWebApp')
     }
 */
     var renderTable = function() {
-      LeafletService.draw(json, '#p'+$scope.paragraph.id+'_mapLeaflet',
+      leafletMapSrv.draw(json, '#p'+$scope.paragraph.id+'_mapLeaflet',
         lat,
         lon,
         val,
@@ -977,11 +976,11 @@ angular.module('zeppelinWebApp')
   };
 
   var setMultiple = function(type, data, refresh) { 
-    var json = PivotService.crossData(data); 
+    var json = pivotSrv.crossData(data); 
     var idDiv = '#p'+$scope.paragraph.id+'_multiple div';
 
     var renderTable = function() {
-      MultipleService.draw(json, idDiv, $scope.paragraph.config.graph.xserie[0], $scope.paragraph.config.graph.yseries);
+      multipleSrv.draw(json, idDiv, $scope.paragraph.config.graph.xserie[0], $scope.paragraph.config.graph.yseries);
     };
 
     var retryRenderer = function() {
@@ -999,7 +998,7 @@ angular.module('zeppelinWebApp')
   }
 
   var setPivot = function(type, data, refresh) {
-    var json = PivotService.crossData(data); 
+    var json = pivotSrv.crossData(data); 
     var derivers = $.pivotUtilities.derivers;
     var renderers = $.extend($.pivotUtilities.renderers, 
                     $.pivotUtilities.gchart_renderers);    
@@ -1010,8 +1009,17 @@ angular.module('zeppelinWebApp')
   var setD3Chart = function(type, data, refresh) {
     if (!$scope.chart[type]) {
       var chart = nv.models[type]();
-      $scope.chart[type] = chart;
-      $scope.chart[type].color(['#666484', '#55A08E']);
+      $scope.chart[type] = chart;      
+      
+      $scope.arrayColors = [];
+      jQuery.each($rootScope.newStyles, function(i, value) {              
+        if (value.name == $rootScope.newCSS) {
+          $scope.arrayColors = value.arrayColors; 
+        };
+      });      
+      if ($scope.arrayColors.length > 0) {           
+        $scope.chart[type].color($scope.arrayColors);
+      };
     }
 
     var d3g = [];

@@ -17,6 +17,9 @@
 
 angular.module('zeppelinWebApp')
 .run(['$http','baseUrlSrv', function($http, baseUrlSrv) {
+    
+    $http.defaults.headers.common['Authorization'] = 'Basic ZGV2ZWxvcDpkZXZlbG9w';
+
     $http.get(baseUrlSrv.getUnprivilegedRestApiBase() + '/environment/ticket').
 
         success(function(ticket, status, headers, config) {
@@ -30,7 +33,7 @@ angular.module('zeppelinWebApp')
           console.log('Could not get ticket');
         });
 
-}]).controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, baseUrlSrv, $http) {
+}]).controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, baseUrlSrv, $http, dataMapSrv, pivotSrv, leafletMapSrv, multipleSrv) {
 
   if (!$rootScope.ticket) {
       $rootScope.ticket = {
@@ -45,6 +48,11 @@ angular.module('zeppelinWebApp')
   vm.connected = websocketMsgSrv.isConnected();
   vm.websocketMsgSrv = websocketMsgSrv;
   vm.arrayOrderingSrv = arrayOrderingSrv;
+
+  vm.dataMapSrv = dataMapSrv;
+  vm.leafletMapSrv = leafletMapSrv;
+  vm.multipleSrv = multipleSrv;
+  vm.pivotSrv = pivotSrv;
 
   $('#notebook-list').perfectScrollbar({suppressScrollX: true});
 
