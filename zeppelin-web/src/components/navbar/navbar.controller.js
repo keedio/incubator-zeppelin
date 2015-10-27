@@ -16,12 +16,7 @@
 'use strict';
 
 angular.module('zeppelinWebApp')
-.run(function($http, LS, $base64) {
-  
-  var encoded = $base64.encode(LS.getData('userInfo.principal') + ":" + LS.getData('userInfo.password'));
-  $http.defaults.headers.common.Authorization = 'Basic ' + encoded;
-})
-.controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http, baseUrlSrv, LS, $location, $route) {
+.controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http, baseUrlSrv, LS, $location, $route, loginSrv) {
  
   /** Current list of notes (ids) */
 
@@ -33,10 +28,16 @@ angular.module('zeppelinWebApp')
 
   //$('#notebook-list').perfectScrollbar({suppressScrollX: true});
   $scope.logout = function() {
-    LS.clear();
-    delete $rootScope.ticket;
-    delete $http.defaults.headers.common.Authorization;
-    $http.get(baseUrlSrv.getRestApiBase()+'/security/ticket');
+    var promise = loginSrv.logout();
+    promise.then(function() {
+      delete $rootScope.ticket;
+      delete $http.defaults.headers.common.Authorization;
+      $location.path('/login')
+    }
+
+    )
+
+    //$http.get(baseUrlSrv.getRestApiBase()+'/security/ticket');
   }
 
   $scope.$on('setNoteMenu', function(event, notes) {

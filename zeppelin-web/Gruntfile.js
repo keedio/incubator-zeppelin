@@ -25,6 +25,7 @@
 // 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
+  grunt.loadNpmTasks('grunt-connect-proxy');
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
@@ -107,9 +108,14 @@ module.exports = function (grunt) {
       options: {
         port: 9000,
         // Change this to '0.0.0.0' to access the server from outside.
-        hostname: '0.0.0.0',
+        hostname: 'localhost',
         livereload: 35729
       },
+       proxies: [{
+         context: '/api', // the api pattern you need to proxy(i am going to proxy all the requests that are having a path as /api)
+         host: 'localhost', // the backend server host ip
+         port: 8080 // the backend server port
+       }],
       livereload: {
         options: {
           open: true,
@@ -120,7 +126,7 @@ module.exports = function (grunt) {
                 '/bower_components',
                 connect.static('./bower_components')
               ),
-              connect.static(appConfig.app)
+              connect.static(appConfig.app),
             ];
           }
         }
@@ -214,7 +220,8 @@ module.exports = function (grunt) {
         flow: {
           html: {
             steps: {
-              js: ['concat', 'uglifyjs'],
+//              js: ['concat', 'uglifyjs'],
+              js: ['concat'],
               css: ['cssmin']
             },
             post: {}
@@ -388,6 +395,7 @@ module.exports = function (grunt) {
       'clean:server',
       'wiredep',
       'concurrent:server',
+      'configureProxies:server',
       'autoprefixer',
       'connect:livereload',
       'watch'
