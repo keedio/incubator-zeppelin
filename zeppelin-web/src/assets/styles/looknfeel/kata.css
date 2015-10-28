@@ -127,9 +127,21 @@ body .navbar {
   border: 2px solid #837D93;
 }
 
-#notebook-list li > a:hover,
-.dropdown-menu li > a:hover {
+#notebook-list li > a {
   font-family: Dsignes Bold;
+  color: #B0B0B0;
+}
+
+
+#notebook-list >.open>a, #notebook-list >.open>a:hover, 
+#notebook-list >.open>a:focus {
+  background: #FF0000;
+  color: #FFFF00;
+}
+
+
+#notebook-list li > a:hover,
+.dropdown-menu li > a:hover {  
   background: #B0B0B0;
   color: #FFFFFF;
 }

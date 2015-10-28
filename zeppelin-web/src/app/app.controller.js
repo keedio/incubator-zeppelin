@@ -16,9 +16,15 @@
 angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootScope, $window) {
   $rootScope.compiledScope = $scope.$new(true, $rootScope);
   $scope.looknfeel = 'default';
-  // set the default theme   
-  $rootScope.newCSS = 'default';  
-
+  
+  // set the default theme     
+  if (localStorage.getItem("lsCSS") === undefined || localStorage.getItem("lsCSS") === null) {
+    $rootScope.newCSS = 'default';
+  }
+  else {
+    $rootScope.newCSS = localStorage.getItem("lsCSS");
+  };   
+  
   // create the list of themes. Same name that css file.  
   $rootScope.newStyles = [  
     { name: 'default', url: 'default', arrayColors: []},  
@@ -54,6 +60,8 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
 
   $rootScope.setNewCSS = function(newCSS) {
     $rootScope.newCSS = newCSS;  
+    localStorage.setItem("lsCSS", $rootScope.newCSS);
+    $window.location.reload();
   };
 
 });
