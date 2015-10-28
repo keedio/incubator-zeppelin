@@ -48,17 +48,29 @@ limitations under the License.
       <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
         <li class="server-status">
           <i class="fa fa-circle" ng-class="{'server-connected':navbar.connected, 'server-disconnected':!navbar.connected}"></i>
-          <span ng-show="navbar.connected">User {{ticket.principal}} connected</span>
-          <span ng-show="!navbar.connected">Disconnected</span>
+          <span ng-show="navbar.connected"
+                ng-class="{'server-connected':navbar.connected, 'server-disconnected':!navbar.connected}">
+            Connected
+          </span>
+          <span ng-show="!navbar.connected"
+                ng-class="{'server-connected':navbar.connected, 'server-disconnected':!navbar.connected}">
+            Disconnected
+          </span>
+        </li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
+        <li class="server-status">          
+          <span ng-show="navbar.connected"> User {{ticket.principal}} </span>          
         </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
-        <li>
+        <li class="navbar-css">
           <span class="btn-group">
             <button id="btnStyles"
                     type="button"
-                    class="btn btn-default btn-xs dropdown-toggle"
+                    class="btn btn-default btn-xs dropdown-toggle btn-default-navbar"
                     data-toggle="dropdown">
               {{newCSS}} <span class="caret"></span>
             </button>
@@ -70,7 +82,8 @@ limitations under the License.
             </ul>
           </span>
         </li>
-      </ul>        
+      </ul>
+
     </div>
   </div>
 </div>

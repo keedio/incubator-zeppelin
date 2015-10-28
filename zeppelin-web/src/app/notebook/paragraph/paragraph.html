@@ -105,43 +105,43 @@ limitations under the License.
            ng-if="paragraph.result.type == 'TABLE' && !asIframe && !viewOnly"
            class="btn-group"
            style='margin-bottom: 10px;'>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('table')}"
                 ng-click="setGraphMode('table', true)" ><i class="fa fa-table"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('multiBarChart')}"
                 ng-click="setGraphMode('multiBarChart', true)"><i class="fa fa-bar-chart"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('pieChart')}"
                 ng-click="setGraphMode('pieChart', true)"><i class="fa fa-pie-chart"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('stackedAreaChart')}"
                 ng-click="setGraphMode('stackedAreaChart', true)"><i class="fa fa-area-chart"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('lineChart')}"
                 ng-click="setGraphMode('lineChart', true)"><i class="fa fa-line-chart"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('scatterChart')}"
                 ng-click="setGraphMode('scatterChart', true)"><i class="cf cf-scatter-chart"></i>
         </button>
-	      <button type="button" class="btn btn-default btn-sm"
+	      <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
 		            ng-class="{'active': isGraphMode('mapChart')}"
 		            ng-click="setGraphMode('mapChart', true)"><i class="fa fa-globe"></i>
 	      </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('leafletMap')}"
                 ng-click="setGraphMode('leafletMap', true)"><i class="fa fa-map-marker"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('multiple')}"
                 ng-click="setGraphMode('multiple', true)"><i class="fa fa-list-ol"></i>
         </button>
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn-default-paragraph"
                 ng-class="{'active': isGraphMode('pivot')}"
                 ng-click="setGraphMode('pivot', true)"><i class="fa fa-magic"></i>
         </button>

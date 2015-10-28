@@ -19,34 +19,34 @@ limitations under the License.
     <p class="form-control-static2" ng-click="showEditor = true" ng-show="!showEditor">{{note.name || 'Note ' + note.id}}</p>
     <span class="labelBtn btn-group">
       <button type="button"
-              class="btn btn-default btn-xs"
+              class="btn btn-default btn-xs btn-default-notebook"
               ng-click="runNote()"
               ng-class="{'disabled':isNoteRunning()}"
               tooltip-placement="bottom" tooltip="Run all the notes">
         <i class="icon-control-play"></i>
       </button>
       <button type="button"
-              class="btn btn-default btn-xs"
+              class="btn btn-default btn-xs btn-default-notebook"
               ng-click="toggleAllEditor()"
               ng-hide="viewOnly"
               tooltip-placement="bottom" tooltip="Show/hide the code">
         <i ng-class="editorToggled ?  'fa icon-size-fullscreen' :'fa icon-size-actual'"></i></button>
       <button type="button"
-              class="btn btn-default btn-xs"
+              class="btn btn-default btn-xs btn-default-notebook"
               ng-click="toggleAllTable()"
               ng-hide="viewOnly"
               tooltip-placement="bottom" tooltip="Show/hide the output">
         <i ng-class="tableToggled ? 'fa icon-notebook' : 'fa icon-book-open'"></i>
       </button>
       <button type="button"
-              class="btn btn-default btn-xs"
+              class="btn btn-default btn-xs btn-default-notebook"
               ng-click="removeNote(note.id)"
               ng-hide="viewOnly"
               tooltip-placement="bottom" tooltip="Remove the notebook">
         <i class="icon-trash"></i>
       </button>
       <button type="button"
-              class="btn btn-default btn-xs"
+              class="btn btn-default btn-xs btn-default-notebook"
               ng-hide="viewOnly"
               tooltip-placement="bottom" tooltip="Clone the notebook"
               data-toggle="modal" data-target="#noteNameModal" data-clone="true"
@@ -57,7 +57,7 @@ limitations under the License.
 
     <span ng-hide="viewOnly">
       <div class="labelBtn btn-group">
-        <div class="btn btn-default btn-xs dropdown-toggle"
+        <div class="btn btn-default btn-xs dropdown-toggle btn-default-notebook"
              type="button"
              data-toggle="dropdown"
              ng-class="{ 'btn-info' : note.config.cron, 'btn-danger' : note.info.cron, 'btn-default' : !note.config.cron}"
@@ -102,11 +102,11 @@ limitations under the License.
       <span style="position:relative; top:2px; margin-right:4px; cursor:pointer;"
             ng-click="toggleSetting()"
             tooltip-placement="bottom" tooltip="Interpreter binding">
-        <i class="fa fa-cog" ng-style="{color: showSetting ? '#3071A9' : 'black' }"></i>
+        <i class="fa fa-cog" ></i>
       </span>
 
       <span class="btn-group">
-        <button type="button" class="btn btn-default btn-xs dropdown-toggle"
+        <button type="button" class="btn btn-default btn-xs dropdown-toggle btn-default-styles"
                 data-toggle="dropdown">
           {{note.config.looknfeel}} <span class="caret"></span>
         </button>
