@@ -176,9 +176,9 @@ limitations under the License.
           </ul>
         </div>
 
-        <ng-include src="'app/components/datamap/form.html'" ng-if="getGraphMode()=='mapChart'"></ng-include>
-        <ng-include src="'app/components/leaflet/form.html'" ng-if="getGraphMode()=='leafletMap'"></ng-include>
-        <ng-include src="'app/components/multiple/form.html'" ng-if="getGraphMode()=='multiple'"></ng-include>
+        <ng-include src="'components/dataMapSrv/form.html'" ng-if="getGraphMode()=='mapChart'"></ng-include>
+        <ng-include src="'components/leafletMapSrv/form.html'" ng-if="getGraphMode()=='leafletMap'"></ng-include>
+        <ng-include src="'components/multipleSrv/form.html'" ng-if="getGraphMode()=='multiple'"></ng-include>
 
         <div class="row" ng-if="getGraphMode()!='scatterChart' && getGraphMode()!='mapChart' && getGraphMode()!='leafletMap' && getGraphMode()!='multiple' && getGraphMode()!='pivot'">
           <div class="col-md-4">

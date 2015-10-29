@@ -274,6 +274,9 @@ a.navbar-brand:hover {
   color: #573C84;
 }
 
+.glyphicon-log-out:hover {
+ cursor:pointer;
+}
 
 /* ****************************************************************************
  * Home.

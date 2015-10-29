@@ -19,7 +19,7 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
   
   // set the default theme     
   if (localStorage.getItem("lsCSS") === undefined || localStorage.getItem("lsCSS") === null) {
-    $rootScope.newCSS = 'default';
+    $rootScope.newCSS = 'kata';
   }
   else {
     $rootScope.newCSS = localStorage.getItem("lsCSS");
@@ -60,8 +60,7 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
 
   $rootScope.setNewCSS = function(newCSS) {
     $rootScope.newCSS = newCSS;  
-    localStorage.setItem("lsCSS", $rootScope.newCSS);
-    //$window.location.reload();
+    localStorage.setItem("lsCSS", $rootScope.newCSS);    
   };
 
 });
