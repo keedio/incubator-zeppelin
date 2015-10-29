@@ -28,7 +28,7 @@ limitations under the License.
     <div class="collapse navbar-collapse" ng-controller="NavCtrl as navbar">
       <ul class="nav navbar-nav">
         <li class="dropdown" dropdown>
-          <a href="#" class="dropdown-toggle" dropdown-toggle>Notebook <span class="caret"></span></a>
+          <a ng-if="(ticket != undefined)" href="#" class="dropdown-toggle" dropdown-toggle>Notebook <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="" data-toggle="modal" data-target="#noteNameModal"><i class="fa fa-plus"></i> Create new note</a></li>
             <li class="divider"></li>
@@ -40,11 +40,17 @@ limitations under the License.
             </div>
           </ul>
         </li>
-        <li>
+        <li ng-if="(ticket != undefined)">
           <a href="#/interpreter">Interpreter</a>
         </li>
       </ul>
       
+      <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
+        <li class="server-status">
+          <span ng-click="logout()" class="glyphicon glyphicon-log-out"></span>
+        </li>
+      </ul>  
+
       <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
         <li class="server-status">
           <i class="fa fa-circle" ng-class="{'server-connected':navbar.connected, 'server-disconnected':!navbar.connected}"></i>
@@ -64,7 +70,7 @@ limitations under the License.
           <span ng-show="navbar.connected"> User {{ticket.principal}} </span>          
         </li>
       </ul>
-      
+   
       <ul class="nav navbar-nav navbar-right" style="margin-top:10px; margin-right:5px;">
         <li class="navbar-css">
           <span class="btn-group">

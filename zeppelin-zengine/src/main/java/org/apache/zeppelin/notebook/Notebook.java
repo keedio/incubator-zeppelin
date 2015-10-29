@@ -70,7 +70,6 @@ public class Notebook {
     quartzSched = quertzSchedFact.getScheduler();
     quartzSched.start();
     CronJob.notebook = this;
-
     loadAllNotes();
   }
 

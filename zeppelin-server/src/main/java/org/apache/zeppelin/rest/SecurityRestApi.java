@@ -62,4 +62,12 @@ public class SecurityRestApi {
 
     return new JsonResponse(Response.Status.OK, "", data).build();
   }
+  
+  @GET
+  @Path("logout")
+  public Response logout() {
+    SecurityUtils.getSubject().logout();;
+    
+    return new JsonResponse(Response.Status.OK, "", "").build();
+  }  
 }

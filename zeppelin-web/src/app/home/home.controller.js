@@ -14,13 +14,6 @@
 'use strict';
 
 angular.module('zeppelinWebApp').controller('HomeCtrl', function($scope, notebookListDataFactory, websocketMsgSrv, $rootScope, arrayOrderingSrv, dataMapSrv, pivotSrv, leafletMapSrv, multipleSrv) {
- if (!$rootScope.ticket) {
-      $rootScope.ticket = {
-                'principal':'anonymous',
-                'ticket':'anonymous'
-              };
-   }
-
   var vm = this;
   vm.notes = notebookListDataFactory;
   vm.websocketMsgSrv = websocketMsgSrv;
@@ -38,7 +31,6 @@ angular.module('zeppelinWebApp').controller('HomeCtrl', function($scope, noteboo
     websocketMsgSrv.getHomeNotebook();
   };
 
-  initHome();
 
   $scope.$on('setNoteContent', function(event, note) {
     if (note) {
@@ -57,4 +49,7 @@ angular.module('zeppelinWebApp').controller('HomeCtrl', function($scope, noteboo
       vm.notebookHome = false;
     }
   });
+
+  initHome();
+
 });

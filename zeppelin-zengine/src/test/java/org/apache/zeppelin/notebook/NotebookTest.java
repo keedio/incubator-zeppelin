@@ -108,8 +108,8 @@ public class NotebookTest implements JobListenerFactory{
 	@Test
 	public void testGetAllNotes() throws IOException {
 		// get all notes after copy the {notebookId}/note.json into notebookDir
-		File srcDir = new File("src/test/resources/2A94M5J1Z");
-		File destDir = new File(notebookDir.getAbsolutePath() + "/users/anonymous/2A94M5J1Z");
+		File srcDir = new File("src/test/resources/2B4Z1MYWC");
+		File destDir = new File(notebookDir.getAbsolutePath() + "/users/anonymous/2B4Z1MYWC");
 		destDir.getParentFile().mkdirs();
 
 		try {
@@ -118,7 +118,7 @@ public class NotebookTest implements JobListenerFactory{
 			e.printStackTrace();
 		}
 
-		Note copiedNote = notebookRepo.get("2A94M5J1Z", "anonymous");
+		Note copiedNote = notebookRepo.get("2B4Z1MYWC", "anonymous");
 
 		// when ZEPPELIN_NOTEBOOK_GET_FROM_REPO set to be false
 		System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_RELOAD_FROM_STORAGE.getVarName(), "false");

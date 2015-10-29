@@ -132,6 +132,27 @@ h5 {
   border-style: solid;
 }
 
+
+/* ****************************************************************************
+ * Login.
+ * ***************************************************************************/
+
+.imgLogin img {
+  content: url('/assets/images/keedio/logo-purple-big.png');    
+}
+
+.login-text {
+  font-family: Dsignes Bold;
+  font-size: 18px;
+  color: #666484;
+}
+
+.login-input-text {
+  font-family: Dsignes Light;
+  font-weight: bold;
+  color: #666484;
+}
+
 /* ****************************************************************************
  * Top Navbar.
  * ***************************************************************************/

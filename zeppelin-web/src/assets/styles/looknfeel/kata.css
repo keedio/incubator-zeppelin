@@ -253,6 +253,29 @@ a.navbar-brand:hover {
 }
 
 /* ****************************************************************************
+ * Login.
+ * ***************************************************************************/
+
+.imgLogin img {
+  content: url('/assets/images/kata/logo.png');  
+  width: 135px; 
+  height: 50px;
+}
+
+.login-text {
+  font-family: Dsignes Bold;
+  font-size: 18px;
+  color: #573C84;
+}
+
+.login-input-text {
+  font-family: Dsignes Light;
+  font-weight: bold;
+  color: #573C84;
+}
+
+
+/* ****************************************************************************
  * Home.
  * ***************************************************************************/
 

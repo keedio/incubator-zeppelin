@@ -61,7 +61,7 @@ angular.module('zeppelinWebApp').controller('MainCtrl', function($scope, $rootSc
   $rootScope.setNewCSS = function(newCSS) {
     $rootScope.newCSS = newCSS;  
     localStorage.setItem("lsCSS", $rootScope.newCSS);
-    $window.location.reload();
+    //$window.location.reload();
   };
 
 });

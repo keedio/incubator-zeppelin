@@ -26,7 +26,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;

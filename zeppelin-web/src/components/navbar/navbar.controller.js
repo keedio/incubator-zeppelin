@@ -16,31 +16,8 @@
 'use strict';
 
 angular.module('zeppelinWebApp')
-.run(['$http','baseUrlSrv', function($http, baseUrlSrv) {
-    
-    $http.defaults.headers.common['Authorization'] = 'Basic ZGV2ZWxvcDpkZXZlbG9w';
-
-    $http.get(baseUrlSrv.getUnprivilegedRestApiBase() + '/environment/ticket').
-
-        success(function(ticket, status, headers, config) {
-          var msgbody = angular.fromJson(ticket).body;
-
-          if (msgbody.isDevelopment === 'true') {
-            $http.defaults.headers.common['Authorization'] = 'Basic ' + msgbody.ticket;
-          }
-        }).
-        error(function(data, status, headers, config) {
-          console.log('Could not get ticket');
-        });
-
-}]).controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, baseUrlSrv, $http, dataMapSrv, pivotSrv, leafletMapSrv, multipleSrv) {
-
-  if (!$rootScope.ticket) {
-      $rootScope.ticket = {
-                'principal':'anonymous',
-                'ticket':'anonymous'
-              };
-   }
+.controller('NavCtrl', function($scope, $rootScope, $routeParams, notebookListDataFactory, websocketMsgSrv, arrayOrderingSrv, $http, baseUrlSrv, LS, $location, $route, loginSrv, dataMapSrv, pivotSrv, leafletMapSrv, multipleSrv) {
+ 
   /** Current list of notes (ids) */
 
   var vm = this;
@@ -48,13 +25,22 @@ angular.module('zeppelinWebApp')
   vm.connected = websocketMsgSrv.isConnected();
   vm.websocketMsgSrv = websocketMsgSrv;
   vm.arrayOrderingSrv = arrayOrderingSrv;
-
   vm.dataMapSrv = dataMapSrv;
   vm.leafletMapSrv = leafletMapSrv;
   vm.multipleSrv = multipleSrv;
   vm.pivotSrv = pivotSrv;
 
   $('#notebook-list').perfectScrollbar({suppressScrollX: true});
+
+  $scope.logout = function() {
+    var promise = loginSrv.logout();
+    promise.then(function() {
+      delete $rootScope.ticket;
+      delete $http.defaults.headers.common.Authorization;
+      $location.path('/login')
+    }
+    )
+  }
 
   $scope.$on('setNoteMenu', function(event, notes) {
     notebookListDataFactory.setNotes(notes);
@@ -72,7 +58,6 @@ angular.module('zeppelinWebApp')
    * Shiro will require credentials here
    * */
   $http.get(baseUrlSrv.getRestApiBase() + '/security/ticket').
-
     success(function(ticket, status, headers, config) {
       $rootScope.ticket = angular.fromJson(ticket).body;
       vm.loadNotes = loadNotes;
