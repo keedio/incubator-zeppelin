@@ -30,7 +30,8 @@ angular.module('zeppelinWebApp').service('loginSrv', function($http, $base64, ba
   	if (user.ticket == undefined) {
 
 	    var encoded = $base64.encode(user + ":" + password);
-	    $http.defaults.headers.common.Authorization = "Basic " + encoded;
+    	$http.defaults.headers.common.Authorization = 'Basic ' + encoded;
+    	$http.defaults.cache = false;	    	
 	    
 	    $http.get(baseUrlSrv.getRestApiBase()+'/security/ticket').
 	    success(function(ticket, status, headers, config) {
@@ -55,6 +56,25 @@ angular.module('zeppelinWebApp').service('loginSrv', function($http, $base64, ba
 
   	return deferred.promise;
 
+  }
+
+  this.logout = function() {
+	
+	var deferred = $q.defer();
+    
+    $http.get(baseUrlSrv.getRestApiBase()+'/security/logout').
+    	success(function(ticket, status, headers, config) {
+      		LS.clear();
+      		deferred.resolve();
+    	}).
+    	error(function(msg, code) {
+      		console.log('Could not logout');
+      		deferred.reject(msg);
+    	}
+    );
+	
+	return deferred.promise;
+	
   }
 
 });

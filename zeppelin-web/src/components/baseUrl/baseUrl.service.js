@@ -36,11 +36,11 @@ angular.module('zeppelinWebApp').service('baseUrlSrv', function() {
   };
 
   this.getRestApiBase = function() {
-    return location.protocol + '//' + location.hostname + ':' + this.getPort() + skipTrailingSlash(location.pathname) + '/api';
+    return location.protocol + '//' + location.hostname + ':' + this.getPort() + '/api';
   };
 
   this.getUnprivilegedRestApiBase = function() {
-      return location.protocol + '//' + location.hostname + ':' + this.getPort() + skipTrailingSlash(location.pathname) + '/publicapi';
+      return location.protocol + '//' + location.hostname + ':' + this.getPort() +  '/publicapi';
     };
 
   var skipTrailingSlash = function(path) {
