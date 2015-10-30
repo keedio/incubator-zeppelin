@@ -31,13 +31,15 @@ public class NoteInfo {
   String owner;
   private List<String> owners = new ArrayList<>();
   private Map<String, Object> config = new HashMap<String, Object>();
+  boolean shared;
 
-  public NoteInfo(String id, String name, String owner, Map<String, Object> config) {
+  public NoteInfo(String id, String name, String owner, Map<String, Object> config, boolean shared) {
     super();
     this.id = id;
     this.name = name;
     this.owner = owner;
     this.config = config;
+    this.shared = shared;
   }
 
   public NoteInfo(Note note) {
@@ -46,6 +48,7 @@ public class NoteInfo {
     owner = note.getOwner();
     config = note.getConfig();
     owners = note.getOwners();
+    shared = note.isShared();
   }
 
   public List<String> getOwners() {
@@ -82,6 +85,14 @@ public class NoteInfo {
 
   public void setConfig(Map<String, Object> config) {
     this.config = config;
+  }
+
+  public boolean isShared() {
+    return shared;
+  }
+
+  public void setIsShared(boolean isShared) {
+    this.shared = isShared;
   }
 
 }
