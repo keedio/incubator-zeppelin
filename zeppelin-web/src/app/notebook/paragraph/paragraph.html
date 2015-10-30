@@ -383,14 +383,14 @@ limitations under the License.
            ng-bind-html="paragraph.result.comment">
       </div>
 
-      <div id="{{paragraph.id}}_text"
-           class="text"
+      <div id="{{paragraph.id}}_text"           
            ng-if="paragraph.result.type == 'TEXT'"
            ng-Init="loadResultType(paragraph.result)"
            ng-bind="paragraph.result.msg">
       </div>
 
       <div id="p{{paragraph.id}}_html"
+           class="text"
            ng-if="paragraph.result.type == 'HTML'"
            ng-Init="loadResultType(paragraph.result)">
       </div>
