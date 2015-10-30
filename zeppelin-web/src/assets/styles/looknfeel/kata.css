@@ -325,8 +325,7 @@ a.navbar-brand:hover {
 
 .zeppelin {
   background-image: url('/assets/images/kata/logo-white.png');
-  background-repeat: no-repeat;
-  background-position: right;
+  background-position: 95% 10%;
   height: 410px;
   opacity: 0.6;
 }
