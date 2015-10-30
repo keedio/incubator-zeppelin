@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.display.AngularObject;
 import org.apache.zeppelin.display.AngularObjectRegistry;
 import org.apache.zeppelin.interpreter.Interpreter;
@@ -46,7 +45,7 @@ public class Note implements Serializable, JobListener {
   private String id;
   private String owner;
   private List<String> owners = new ArrayList<>();
-  private Boolean isShared;
+  private Boolean shared;
   Map<String, List<AngularObject>> angularObjects = new HashMap<String, List<AngularObject>>();
 
   private transient NoteInterpreterLoader replLoader;
@@ -78,8 +77,7 @@ public class Note implements Serializable, JobListener {
     this.replLoader = replLoader;
     this.jobListenerFactory = jobListenerFactory;
     this.owner = owner;
-    owners.add(owner);
-    isShared = false;
+    shared = false;
     generateId();
   }
 
@@ -382,13 +380,43 @@ public class Note implements Serializable, JobListener {
   }
 
   /**
-   * getter for boolean isShared
+   * getter for boolean shared
    * @return
    */
-  public Boolean getIsShared() {
-    return isShared;
+  public Boolean isShared() {
+    return shared;
   }
 
 
+  /**
+   * Share this note.
+   * 1) tag shared set to true
+   * 2) add new owner to owners
+   * @param newOwner
+   * @throws IOException
+   */
+  public void share(String newOwner) throws IOException {
+    this.shared =  repo.share(id,owner, newOwner);
+    if (shared) this.owners.add(newOwner);
+  }
 
+  /**
+   * Revoke sharing this note.
+   * 1) tag shared set to false.
+   * 2) delete all owners from owners lis.
+   * @throws IOException
+   */
+  public void revokeShare() throws IOException{
+    this.shared = repo.revokeShare(id, owner);
+    if(!shared) this.owners.clear();
+  }
+
+  /**
+   * Revoke sharing this note for one single user
+   * @param ownerToRemove
+   * @throws IOException
+   */
+  public void kickOut(String ownerToRemove) throws IOException {
+    this.owners.remove(repo.kickOut(id,owner,ownerToRemove));
+  }
 }
