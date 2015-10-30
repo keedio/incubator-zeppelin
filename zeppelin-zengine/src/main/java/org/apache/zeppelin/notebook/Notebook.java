@@ -497,7 +497,7 @@ public class Notebook {
   public List<Note> getAllSharedNotes(){
     List<Note> noteList = new ArrayList<>();
     for (Note note : this.getAllNotes()){
-      if (note.getIsShared()) {
+      if (note.isShared()) {
         noteList.add(note);
       } else {
         continue;
@@ -523,15 +523,40 @@ public class Notebook {
     return noteList;
   }
  /**
-  *
+  * Share a note with another user.
   * @param id
   * @param principal
   * @param newPrincipal
   * @return
   */
-  public boolean shareNote(String id, String principal, String newPrincipal){
-   Note note = getUserNotes(principal).get(id);
-   note.getOwners().add(newPrincipal);
-   return note.getIsShared();
+  public boolean shareNote(String id , String principal, String newPrincipal) throws IOException{
+   Note note = getNote(id, principal);
+   note.share(newPrincipal);
+   return note.isShared();
+  }
+
+  /**
+   * Stop sharing note with everyone.
+   * @param id
+   * @param principal
+   * @return
+   * @throws IOException
+   */
+  public boolean revokeShareNote(String id, String principal) throws IOException{
+    Note note = getNote(id, principal);
+    note.revokeShare();
+    return note.isShared();
+  }
+
+  /**
+   * Stop sharing note with an specific user.
+   * @param id
+   * @param principal
+   * @param ownerToRemove
+   * @throws IOException
+   */
+  public void kickOutUser(String id, String principal, String ownerToRemove) throws IOException {
+    Note note = getNote(id, principal);
+    note.kickOut(ownerToRemove);
   }
 }
