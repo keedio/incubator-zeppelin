@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentialsProviderChain;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -205,12 +204,23 @@ public class S3NotebookRepo implements NotebookRepo {
   @Override
   //TODO(luis Lázaro): what about share a note in aws?
   public boolean share(String noteId, String owner, String newOwner) throws IOException {
-    return false;
+  return false;
   }
 
   @Override
   //TODO(Luis Lázaro): list shared in aws
   public List<NoteInfo> listShared(String owner) throws IOException {
     return new ArrayList<>();
+  }
+
+  @Override
+  //TODO(Luis lázaro): ...
+  public boolean revokeShare(String noteId, String owner) throws IOException {
+    return false;
+  }
+
+  @Override
+  public String kickOut(String noteId, String owner, String oldOwner) throws IOException {
+    return null;
   }
 }
