@@ -31,7 +31,7 @@ public class NoteInfo {
   String owner;
   private List<String> owners = new ArrayList<>();
   private Map<String, Object> config = new HashMap<String, Object>();
-  boolean shared;
+  boolean shared = false;
 
   public NoteInfo(String id, String name, String owner, Map<String, Object> config, boolean shared) {
     super();
