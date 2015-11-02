@@ -203,7 +203,8 @@ public class NotebookTest implements JobListenerFactory{
 		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "user2"));
 		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "user3"));
 		notebook.kickOutUser("2B4Z1MYWC", "anonymous", "user2");
-
+	    assertEquals(0, notebook.getAllSharedNotes("user2").size());
+		assertEquals(1, notebook.getAllNotes().size());
 	}
 
 
