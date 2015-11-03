@@ -54,8 +54,19 @@ public class SecurityRestApi {
   @Path("ticket")
   public Response ticket() {
     Object oprincipal = SecurityUtils.getSubject().getPrincipal();
-    String principal = oprincipal.toString();
-    String ticket = TicketContainer.instance.getTicket(principal);
+    String principal;
+    if (oprincipal == null)
+      principal = "anonymous";
+    else
+      principal = oprincipal.toString();
+
+    // ticket set to anonymous for anonymous user. Simplify testing.
+    String ticket;
+    if ("anonymous".equals(principal))
+      ticket = "anonymous";
+    else
+      ticket = TicketContainer.instance.getTicket(principal);
+
     Map<String, String> data = new HashMap<>();
     data.put("principal", principal);
     data.put("ticket", ticket);

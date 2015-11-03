@@ -87,12 +87,6 @@ a:hover {
   border: 2px solid #573C84;
 }
 
-.btn-default:active, .btn-default.active {
-  background: #7C2DAA;
-  box-shadow: none;
-  border: 2px solid #573C84;
-}
-
 /* ****************************************************************************
  * Top Navbar.
  * ***************************************************************************/
@@ -117,13 +111,6 @@ body .navbar {
   background: #FFFFFF;
   color: #B0B0B0;
   border: 2px solid #B0B0B0;
-}
-
-.btn-default-navbar:active, .btn-default-navbar.active {
-  background: #837D93;
-  box-shadow: none;
-  color: #FFFFFF;
-  border: 2px solid #837D93;
 }
 
 #notebook-list li > a {
@@ -367,7 +354,6 @@ a.navbar-brand:hover {
 
 .interpreter-box {
   background-color: #FFFFFF; 
-  min-height: 400px;
 }
 
 .row {
@@ -410,12 +396,6 @@ a.navbar-brand:hover {
   border: 2px solid #FFFFFF;
 }
 
-.btn-default-notebook:active, .btn-default-notebook.active {
-  background: #573C84;
-  box-shadow: none;
-  border: 2px solid #573C84;
-}
-
 .btn-default-styles {
   background: #12A6F9;
   color: #FFFFFF;
@@ -428,13 +408,6 @@ a.navbar-brand:hover {
 .btn-default-styles.active, .open > .dropdown-toggle.btn-default-styles {
   background: #FFFFFF;
   color: #12A6F9;
-  border: 2px solid #FFFFFF;
-}
-
-.btn-default-styles:active, .btn-default-styles.active {
-  background: #277AFF;
-  box-shadow: none;
-  color: #FFFFFF;
   border: 2px solid #FFFFFF;
 }
 
@@ -454,11 +427,6 @@ a.navbar-brand:hover {
 .btn-default-paragraph.active, .open > .dropdown-toggle.btn-default-paragraph {
   background: #573C84;
   color: #FFFFFF;
-  border: 2px solid #573C84;
-}
-
-.btn-default-paragraph:active, .btn-default-paragraph.active {
-  background: #573C84; 
   border: 2px solid #573C84;
 }
 

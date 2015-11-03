@@ -33,5 +33,7 @@ public interface NotebookRepo {
   public void save(Note note) throws IOException;
   public void remove(String noteId, String owner) throws IOException;
   boolean share(String noteId, String owner, String newOwner) throws IOException;
+  boolean revokeShare(String noteId, String owner) throws IOException;
+  String kickOut(String noteId, String owner, String oldOwner) throws IOException;
   public List<NoteInfo> listShared(String owner) throws IOException;
 }

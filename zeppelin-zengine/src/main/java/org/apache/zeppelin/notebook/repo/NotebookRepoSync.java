@@ -314,4 +314,14 @@ public class NotebookRepoSync implements NotebookRepo{
     return new ArrayList<>();
   }
 
+  @Override
+  //TODO(Luis Lázaro) ...
+  public boolean revokeShare(String noteId, String owner) throws IOException {
+    return false;
+  }
+
+  @Override
+  public String kickOut(String noteId, String owner, String oldOwner) throws IOException {
+    return null;
+  }
 }

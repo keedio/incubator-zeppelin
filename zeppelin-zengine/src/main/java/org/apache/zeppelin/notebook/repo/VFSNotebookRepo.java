@@ -17,23 +17,17 @@
 
 package org.apache.zeppelin.notebook.repo;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
+import com.google.gson.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileContent;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.NameScope;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.*;
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.conf.ZeppelinConfiguration.ConfVars;
 import org.apache.zeppelin.notebook.Note;
@@ -42,9 +36,6 @@ import org.apache.zeppelin.notebook.Paragraph;
 import org.apache.zeppelin.scheduler.Job.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
 *
@@ -133,45 +124,7 @@ public class VFSNotebookRepo implements NotebookRepo {
         logger.error("Can't read note " + f.getName().toString(), e);
       }
     }
-    return infos;
-  }
-
-  /**
-   * Get list of noteInfo owned by owner and shared whith owner.
-   * @param owner
-   * @return
-   * @throws IOException
-   */
-  @Override
-  public List<NoteInfo> listShared(String owner) throws IOException{
-    List<NoteInfo> infos = new LinkedList<>();
-    FileObject rootDir = fsManager.resolveFile(getRootDir(), "users");
-    if (!rootDir.exists())
-      rootDir.createFolder();
-    logger.info(rootDir.getName().getPath());
-
-    FileObject[] users = rootDir.getChildren();
-    for (FileObject user : users) {
-      if (!isDirectory(user)) {
-        // currently one directory per user saved like, users/[OWNER]/[NOTE_ID]/note.json.
-        // so it must be a directory
-        continue;
-      }
-      FileObject[] notes = user.getChildren();
-      for (FileObject note : notes) {
-        NoteInfo info = null;
-        try {
-          info = getNoteInfo(note);
-          if (info != null && info.getOwners().contains(owner)) {
-            infos.add(info);
-          } else {
-            continue;
-          }
-        } catch (IOException e) {
-          logger.error("Can't read note " + note.getName().toString(), e);
-        }
-      } //end of notes
-    } //end of users
+    infos.addAll(listShared(owner));
     return infos;
   }
 
@@ -203,8 +156,7 @@ public class VFSNotebookRepo implements NotebookRepo {
       }
 
       try {
-        //List<NoteInfo> ownerInfos = list(owner);
-        List<NoteInfo> ownerInfos = listShared(owner);
+        List<NoteInfo> ownerInfos = list(owner);
         if (ownerInfos != null) {
           infos.addAll(ownerInfos);
         }
@@ -330,10 +282,221 @@ public class VFSNotebookRepo implements NotebookRepo {
     noteDir.delete(Selectors.SELECT_SELF_AND_CHILDREN);
   }
 
+  /**
+   * Get list of noteinfo shared with owner, excluding its own notes.
+   * @param owner
+   * @return
+   * @throws IOException
+   */
+  @Override
+  public List<NoteInfo> listShared(String owner) throws IOException{
+    List<NoteInfo> infos = new LinkedList<>();
+    FileObject rootDir = fsManager.resolveFile(getRootDir(), "users");
+    if (!rootDir.exists())
+      rootDir.createFolder();
+    logger.info(rootDir.getName().getPath());
+
+    FileObject[] users = rootDir.getChildren();
+    for (FileObject user : users) {
+      if (!isDirectory(user)) {
+        // currently one directory per user saved like, users/[OWNER]/[NOTE_ID]/note.json.
+        // so it must be a directory
+        continue;
+      }
+      //exclude created owner's notes.
+      if (user.getName().getBaseName().equals(owner)){
+        continue;
+      }
+
+      FileObject[] notes = user.getChildren();
+      for (FileObject note : notes) {
+        NoteInfo info = null;
+        try {
+          info = getNoteInfo(note);
+          if (info.isShared() && info.getOwners().contains(owner)) {
+            infos.add(info);
+          } else {
+            continue;
+          }
+        } catch (IOException e) {
+          logger.error("Can't read note " + note.getName().toString(), e);
+        }
+      } //end of notes
+    } //end of users
+    return infos;
+  }
+
+  /**
+   * Get json from note and set value to shared via aux method 'setValueShared'.
+   * Add new owner for the note.
+   * @param noteId
+   * @param owner
+   * @param newOwner
+   * @return
+   * @throws IOException
+   */
   @Override
   public boolean share(String noteId, String owner, String newOwner) throws IOException {
-    FileObject rootDir = fsManager.resolveFile(getPath("/users/" + owner));
-    FileObject noteDir = rootDir.resolveFile(noteId, NameScope.CHILD);
-    return getNote(noteDir).getOwners().add(newOwner);
+    FileObject noteJson = getNoteJson(noteId, owner);
+    addNewOwner(noteJson, newOwner);
+    return setValueShared(noteJson, true);
   }
+
+  /**
+   * Get json from note and set value to not shared (false) via aux method 'setValueShared'.
+   * Owner's list is keept.
+   * @param noteId
+   * @param owner
+   * @return
+   * @throws IOException
+   */
+  @Override
+  public boolean revokeShare(String noteId, String owner) throws IOException {
+    FileObject noteJson = getNoteJson(noteId, owner);
+    removeOwners(noteJson);
+    return setValueShared(noteJson, false);
+  }
+
+  /**
+   * Remove one single owner from note's list owners.
+   * @param noteId
+   * @param owner
+   * @param ownerToRemove
+   * @return
+   * @throws IOException
+   */
+  @Override
+  public String kickOut(String noteId, String owner, String ownerToRemove) throws IOException {
+    FileObject noteJson = getNoteJson(noteId, owner);
+    return removeSingleOwner(noteJson, ownerToRemove);
+  }
+
+  /**
+   * Aux method for share:  Get note.json's key called isShared and change boolean value.
+   * @param noteJson
+   * @param value
+   * @return
+   * @throws IOException
+   */
+  private boolean setValueShared(FileObject noteJson, boolean value) throws IOException{
+    JsonParser gsonParser = new JsonParser();
+    Path path = Paths.get(noteJson.getName().getPath());
+    JsonElement jsonElement = gsonParser.parse(new String(Files.readAllBytes(path)));
+    // Update json document
+    JsonObject jsonObject = jsonElement.getAsJsonObject();
+    for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
+      if(entry.getKey().equals("shared")) {
+        entry.setValue(gsonParser.parse(String.valueOf(value)));
+        break;
+      }
+    }
+    // serialize note.json
+    OutputStream out = noteJson.getContent().getOutputStream(false);
+    out.write(jsonElement.getAsJsonObject().toString().getBytes(conf.getString(ConfVars.ZEPPELIN_ENCODING)));
+    out.close();
+    return gsonParser.parse(new String(Files.readAllBytes(path))).getAsJsonObject().get("shared").getAsBoolean();
+  }
+
+  /**
+   * Aux method for share: get note.json's key called owners and add a new one.
+   * @param noteJson
+   * @param newOwner
+   * @return
+   * @throws IOException
+   */
+  private String addNewOwner(FileObject noteJson, String newOwner) throws IOException {
+    JsonParser gsonParser = new JsonParser();
+    Path path = Paths.get(noteJson.getName().getPath());
+    JsonElement jsonElement = gsonParser.parse(new String(Files.readAllBytes(path)));
+
+    // Update json document
+    jsonElement.getAsJsonObject().getAsJsonArray("owners").add(gsonParser.parse(newOwner));
+    // serialize note.json
+    OutputStream out = noteJson.getContent().getOutputStream(false);
+    out.write(jsonElement.getAsJsonObject().toString().getBytes(conf.getString(ConfVars.ZEPPELIN_ENCODING)));
+    out.close();
+    return newOwner;
+  }
+
+  /**
+   * Aux method for revokeShare: remove all elements from owners's list except creator's note.
+   * @param noteJson
+   * @return
+   * @throws IOException
+   */
+  private boolean removeOwners(FileObject noteJson) throws IOException {
+    JsonParser gsonParser = new JsonParser();
+    Path path = Paths.get(noteJson.getName().getPath());
+    JsonElement jsonElement = gsonParser.parse(new String(Files.readAllBytes(path)));
+    JsonObject jsonObject = jsonElement.getAsJsonObject();
+    int size = 0;
+    boolean removed = false;
+    for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
+      if(entry.getKey().equals("owners")) {
+        JsonArray jsonOwners = entry.getValue().getAsJsonArray();
+        Iterator<JsonElement> iterator = jsonOwners.iterator();
+        while(iterator.hasNext()){
+            iterator.next();
+            iterator.remove();
+        }
+        size = jsonOwners.size();
+        break; //stop when find key: owners
+      }
+    }
+    if (size == 0) {
+      OutputStream out = noteJson.getContent().getOutputStream(false);
+      out.write(jsonElement.getAsJsonObject().toString().getBytes(conf.getString(ConfVars.ZEPPELIN_ENCODING)));
+      out.close();
+      removed = true;
+    }
+    return removed;
+  }
+
+  /**
+   * Remove a single user from owners's list in note.json
+   * @param noteJson
+   * @param ownerToRemove
+   * @throws IOException
+   */
+  private String removeSingleOwner(FileObject noteJson, String ownerToRemove) throws IOException {
+    JsonParser gsonParser = new JsonParser();
+    Path path = Paths.get(noteJson.getName().getPath());
+    JsonElement jsonElement = gsonParser.parse(new String(Files.readAllBytes(path)));
+    JsonObject jsonObject = jsonElement.getAsJsonObject();
+    String ownerRemoved = "";
+    for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
+      if(entry.getKey().equals("owners")) {
+        JsonArray jsonOwners = entry.getValue().getAsJsonArray();
+        Iterator<JsonElement> iterator = jsonOwners.iterator();
+        while(iterator.hasNext()){
+          JsonElement owner = iterator.next();
+          if (owner.getAsString().equals(ownerToRemove)) {
+            iterator.remove();
+            ownerRemoved = owner.getAsString();
+            break;
+          }
+        }
+        break;
+      }
+    }
+    OutputStream out = noteJson.getContent().getOutputStream(false);
+    out.write(jsonElement.getAsJsonObject().toString().getBytes(conf.getString(ConfVars.ZEPPELIN_ENCODING)));
+    out.close();
+    return ownerRemoved;
+  }
+
+  /**
+   * Get note.json allocated in user directory as a FileObject.
+   * @param noteId
+   * @param owner
+   * @return
+   * @throws IOException
+   */
+  private FileObject getNoteJson(String noteId, String owner) throws IOException{
+      FileObject rootDir = fsManager.resolveFile(getPath("/users/" + owner));
+      FileObject noteDir = rootDir.resolveFile(noteId, NameScope.CHILD);
+      FileObject noteJson = noteDir.resolveFile("note.json", NameScope.CHILD);
+      return noteJson;
+  }
+
 }

@@ -16,10 +16,8 @@
   "name": "Note ZM75ZUBD6",
   "id": "2B4Z1MYWC",
   "owner": "anonymous",
-  "owners": [
-    "anonymous"
-  ],
-  "isShared": false,
+  "owners": [],
+  "shared": false,
   "angularObjects": {
     "2B3CY7CJY": [],
     "2B51ABNJQ": [],

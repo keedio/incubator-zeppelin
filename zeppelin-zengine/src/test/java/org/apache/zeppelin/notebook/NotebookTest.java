@@ -17,10 +17,6 @@
 
 package org.apache.zeppelin.notebook;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -45,6 +41,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.quartz.SchedulerException;
+
+import static org.junit.Assert.*;
 
 public class NotebookTest implements JobListenerFactory{
 	private File tmpDir;
@@ -146,6 +144,69 @@ public class NotebookTest implements JobListenerFactory{
 		notes = notebook.getAllNotes();
 		assertEquals(notes.size(), 0);
 	}
+
+	@Test
+	public void testShareNote() throws IOException{
+		// get all notes after copy the {notebookId}/note.json into notebookDir
+		File srcDir = new File("src/test/resources/2B4Z1MYWC");
+		File destDir = new File(notebookDir.getAbsolutePath() + "/users/anonymous/2B4Z1MYWC");
+		destDir.getParentFile().mkdirs();
+
+		try {
+			FileUtils.copyDirectory(srcDir, destDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_RELOAD_FROM_STORAGE.getVarName(), "true");
+		notebook.getAllNotes();
+		assertNotNull(notebook.getNote("2B4Z1MYWC", "anonymous"));
+		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "userNew"));
+		assert(notebook.getNote("2B4Z1MYWC", "anonymous").isShared());
+	}
+
+	@Test
+	public void testRevokeShareNote() throws IOException{
+		File srcDir = new File("src/test/resources/2B4Z1MYWC");
+		File destDir = new File(notebookDir.getAbsolutePath() + "/users/anonymous/2B4Z1MYWC");
+		destDir.getParentFile().mkdirs();
+
+		try {
+			FileUtils.copyDirectory(srcDir, destDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_RELOAD_FROM_STORAGE.getVarName(), "true");
+		notebook.getAllNotes();
+		assertNotNull(notebook.getNote("2B4Z1MYWC", "anonymous"));
+		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "user1"));
+		assert(notebook.getNote("2B4Z1MYWC", "anonymous").isShared());
+		assertFalse(notebook.revokeShareNote("2B4Z1MYWC", "anonymous"));
+		assertFalse(notebook.getNote("2B4Z1MYWC", "anonymous").isShared());
+	}
+
+	@Test
+	public void testKickOutUser() throws IOException{
+		File srcDir = new File("src/test/resources/2B4Z1MYWC");
+		File destDir = new File(notebookDir.getAbsolutePath() + "/users/anonymous/2B4Z1MYWC");
+		destDir.getParentFile().mkdirs();
+
+		try {
+			FileUtils.copyDirectory(srcDir, destDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.setProperty(ConfVars.ZEPPELIN_NOTEBOOK_RELOAD_FROM_STORAGE.getVarName(), "true");
+		notebook.getAllNotes();
+		assertNotNull(notebook.getNote("2B4Z1MYWC", "anonymous"));
+		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "user1"));
+		assert(notebook.getNote("2B4Z1MYWC", "anonymous").isShared());
+		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "user2"));
+		assert(notebook.shareNote("2B4Z1MYWC", "anonymous", "user3"));
+		notebook.kickOutUser("2B4Z1MYWC", "anonymous", "user2");
+	    assertEquals(0, notebook.getAllSharedNotes("user2").size());
+		assertEquals(1, notebook.getAllNotes().size());
+	}
+
 
 	@Test
 	public void testPersist() throws IOException, SchedulerException{
@@ -287,4 +348,5 @@ public class NotebookTest implements JobListenerFactory{
 			}
 		};
 	}
+
 }
